@@ -1,0 +1,178 @@
+// Ostravuj — databázové schéma
+// Postgres 17 on Supabase (eu-west-1)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ─────────────────────────────────────────────
+// AUTH / USERS
+// Authentication handled by Supabase Auth (auth.users).
+// Profile extends it with app-level data, linked by id.
+// ─────────────────────────────────────────────
+
+enum Role {
+  SUPERADMIN
+  EDITOR
+}
+
+model Profile {
+  id        String   @id @db.Uuid
+  email     String   @unique
+  name      String?
+  role      Role     @default(EDITOR)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt      @map("updated_at")
+
+  createdPlaces  Place[]    @relation("PlaceCreatedBy")
+  authoredDrafts Draft[]    @relation("DraftCreatedBy")
+  reviewedDrafts Draft[]    @relation("DraftReviewedBy")
+  auditLogs      AuditLog[]
+
+  @@map("profiles")
+}
+
+// ─────────────────────────────────────────────
+// CATEGORIES
+// ─────────────────────────────────────────────
+
+model Category {
+  id          Int      @id @default(autoincrement())
+  slug        String   @unique
+  name        String
+  emoji       String?
+  description String?
+  sortOrder   Int      @default(0) @map("sort_order")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  places Place[]
+
+  @@map("categories")
+}
+
+// ─────────────────────────────────────────────
+// PLACES
+// ─────────────────────────────────────────────
+
+enum PlaceStatus {
+  PUBLISHED
+  ARCHIVED
+}
+
+model Place {
+  id          String      @id @default(uuid()) @db.Uuid
+  slug        String      @unique
+  name        String
+  address     String
+  mapsUrl     String?     @map("maps_url")
+  description String      @db.Text
+  categoryId  Int         @map("category_id")
+  status      PlaceStatus @default(PUBLISHED)
+
+  createdById String?  @map("created_by") @db.Uuid
+  createdBy   Profile? @relation("PlaceCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt      @map("updated_at")
+
+  category     Category      @relation(fields: [categoryId], references: [id])
+  photos       PlacePhoto[]
+  discountCode DiscountCode?
+  drafts       Draft[]
+
+  @@index([categoryId])
+  @@index([status])
+  @@map("places")
+}
+
+model PlacePhoto {
+  id        String   @id @default(uuid()) @db.Uuid
+  placeId   String   @map("place_id") @db.Uuid
+  url       String
+  alt       String?
+  sortOrder Int      @default(0) @map("sort_order")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  place Place @relation(fields: [placeId], references: [id], onDelete: Cascade)
+
+  @@index([placeId])
+  @@map("place_photos")
+}
+
+model DiscountCode {
+  id          String    @id @default(uuid()) @db.Uuid
+  placeId     String    @unique @map("place_id") @db.Uuid
+  code        String
+  description String?
+  validUntil  DateTime? @map("valid_until")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  place Place @relation(fields: [placeId], references: [id], onDelete: Cascade)
+
+  @@map("discount_codes")
+}
+
+// ─────────────────────────────────────────────
+// DRAFTS / APPROVAL WORKFLOW
+// Editor creates DRAFT → submits (PENDING_APPROVAL)
+// → superadmin APPROVED/REJECTED → PUBLISHED
+// ─────────────────────────────────────────────
+
+enum DraftStatus {
+  DRAFT
+  PENDING_APPROVAL
+  APPROVED
+  REJECTED
+  PUBLISHED
+}
+
+model Draft {
+  id      String      @id @default(uuid()) @db.Uuid
+  placeId String?     @map("place_id") @db.Uuid
+  payload Json
+  status  DraftStatus @default(DRAFT)
+
+  createdById String  @map("created_by") @db.Uuid
+  createdBy   Profile @relation("DraftCreatedBy", fields: [createdById], references: [id], onDelete: Cascade)
+
+  reviewedById String?  @map("reviewed_by") @db.Uuid
+  reviewedBy   Profile? @relation("DraftReviewedBy", fields: [reviewedById], references: [id], onDelete: SetNull)
+
+  reviewNote String?   @map("review_note") @db.Text
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt       @map("updated_at")
+  reviewedAt DateTime? @map("reviewed_at")
+
+  place Place? @relation(fields: [placeId], references: [id], onDelete: SetNull)
+
+  @@index([status])
+  @@index([createdById])
+  @@map("drafts")
+}
+
+// ─────────────────────────────────────────────
+// AUDIT LOG
+// ─────────────────────────────────────────────
+
+model AuditLog {
+  id         String   @id @default(uuid()) @db.Uuid
+  actorId    String?  @map("actor_id") @db.Uuid
+  action     String
+  entityType String   @map("entity_type")
+  entityId   String?  @map("entity_id")
+  metadata   Json?
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  actor Profile? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([entityType, entityId])
+  @@index([actorId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
