@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { Header } from "@/components/header";
+import { Footer } from "@/components/footer";
+import { RandomPickerProvider } from "@/components/random-picker";
 
 const inter = Inter({
   subsets: ["latin", "latin-ext"],
@@ -30,8 +33,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="cs" className={inter.variable}>
-      <body className="min-h-screen bg-white font-sans text-neutral-900 antialiased">
-        {children}
+      <body className="min-h-screen bg-white font-sans text-ink antialiased">
+        <RandomPickerProvider>
+          <Header />
+          <main>{children}</main>
+          <Footer />
+        </RandomPickerProvider>
       </body>
     </html>
   );
