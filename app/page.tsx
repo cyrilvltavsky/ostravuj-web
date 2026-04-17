@@ -3,7 +3,6 @@ import { AnimateOnScroll } from "@/components/animate-on-scroll";
 import { CategoryCard } from "@/components/category-card";
 import { PlaceCard } from "@/components/place-card";
 import { BigRandomButton, HeroRandomButton } from "@/components/random-picker";
-import { Typewriter } from "@/components/typewriter";
 import {
   CATEGORIES,
   PLACES,
@@ -128,7 +127,7 @@ export default function HomePage() {
                 Nevíš kam?
               </span>
               <h2 className="mb-3.5 mt-3 text-[clamp(28px,5vw,44px)] font-extrabold tracking-tight text-ink">
-                <Typewriter text="Objevuj nejlepší místa v Ostravě" speed={50} />
+                Objevuj nejlepší místa v Ostravě
               </h2>
               <p className="mx-auto mb-8 max-w-[500px] text-[17px] text-ink-muted">
                 Máme pro tebe {total} ověřených míst. Klikni a my ti jedno

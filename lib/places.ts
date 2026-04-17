@@ -13,6 +13,14 @@ export type SubcategorySlug =
   | "rodina"
   | "vyhlidka";
 
+export type PlaceContacts = {
+  phone?: string;
+  email?: string;
+  website?: string;
+  instagram?: string;
+  facebook?: string;
+};
+
 export type Place = {
   id: number;
   slug: string;
@@ -25,6 +33,11 @@ export type Place = {
   shortDesc: string;
   discountCode: string | null;
   image: string;
+  /** Optional contacts. In future admin, a per-place toggle decides
+   * whether to display these. For now: shown if `showContacts !== false`
+   * and at least one contact field is filled. */
+  contacts?: PlaceContacts;
+  showContacts?: boolean;
 };
 
 export type CategoryMeta = {
@@ -159,6 +172,17 @@ export function categoryCounts(): Record<CategorySlug, number> {
 
 export function googleMapsUrl(address: string): string {
   return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}`;
+}
+
+export function mapyComUrl(address: string): string {
+  return `https://mapy.com/zakladni?q=${encodeURIComponent(address)}`;
+}
+
+export function hasVisibleContacts(place: Place): boolean {
+  if (place.showContacts === false) return false;
+  const c = place.contacts;
+  if (!c) return false;
+  return Boolean(c.phone || c.email || c.website || c.instagram || c.facebook);
 }
 
 /** Curated featured selection used on the homepage. */
