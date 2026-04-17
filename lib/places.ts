@@ -36,6 +36,8 @@ export type CategoryMeta = {
   emoji: string;
   /** Tailwind background class for the icon tile */
   iconBg: string;
+  /** Unsplash thumbnail used in the category card */
+  image: string;
 };
 
 export const CATEGORIES: CategoryMeta[] = [
@@ -48,6 +50,7 @@ export const CATEGORIES: CategoryMeta[] = [
     description: "Restaurace, bistra, kavárny a hospody",
     emoji: "🍷",
     iconBg: "bg-peach",
+    image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&q=80",
   },
   {
     slug: "aktivity",
@@ -58,6 +61,7 @@ export const CATEGORIES: CategoryMeta[] = [
     description: "Galerie, památky, rodinné výlety",
     emoji: "🏛️",
     iconBg: "bg-lavender",
+    image: "https://images.unsplash.com/photo-1577720580479-7d839d829c73?w=400&q=80",
   },
   {
     slug: "rande",
@@ -68,6 +72,7 @@ export const CATEGORIES: CategoryMeta[] = [
     description: "Romantická místa a vyhlídky",
     emoji: "💕",
     iconBg: "bg-rose",
+    image: "https://images.unsplash.com/photo-1492571350019-22de08371fd3?w=400&q=80",
   },
   {
     slug: "zdarma",
@@ -77,6 +82,7 @@ export const CATEGORIES: CategoryMeta[] = [
     description: "Parky, vyhlídky a místa bez vstupného",
     emoji: "🌿",
     iconBg: "bg-mint",
+    image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400&q=80",
   },
 ];
 
@@ -105,7 +111,7 @@ export const PLACES: Place[] = [
   { id: 11, slug: "tsuri-ramen-sushi", name: "Tsurī", category: "gastro", subcategory: "restaurace", tags: ["japonská", "ramen", "sushi"], address: "Hlavní třída 864, 708 00 Ostrava-Poruba", district: "Poruba", shortDesc: "Autentická japonská kuchyně v srdci Poruby. Výborný ramen, čerstvé sushi a izakaya atmosféra. Tip pro milovníky japonského streetfoodu.", discountCode: null, image: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=1200&q=80" },
   { id: 12, slug: "sbeerka", name: "Sbeerka", category: "gastro", subcategory: "hospoda", tags: ["craft beer", "pivní bar", "široký výběr"], address: "Francouzská 6170, 708 00 Ostrava-Poruba", district: "Poruba", shortDesc: "Bar s unikátní sbírkou českých i zahraničních pivovarů. Stálá nabídka 12 piv na čepu a chlazená lednička plná raritních láhví.", discountCode: null, image: "https://images.unsplash.com/photo-1436076863939-06870fe779c2?w=1200&q=80" },
   { id: 13, slug: "cokafe-poruba", name: "CØKAFE Poruba", category: "gastro", subcategory: "kavarna", tags: ["výběrová káva", "snídaně", "wifi"], address: "Hlavní třída 679, 708 00 Ostrava-Poruba", district: "Poruba", shortDesc: "Porubská pobočka oblíbené specialty kavárny. Snídaňové menu, obědové bowls a bezkonkurenční káva. Tichý koutek pro práci.", discountCode: null, image: "https://images.unsplash.com/photo-1559305616-3f99cd43e353?w=1200&q=80" },
-  { id: 14, slug: "dolni-vitkovice", name: "Dolní Vítkovice", category: "aktivity", subcategory: "pamatka", tags: ["industriální", "prohlídky", "kultura"], address: "Vítkovice 3004, 703 00 Ostrava-Vítkovice", district: "Vítkovice", shortDesc: "Legendární průmyslový areál zapsaný v seznamu Evropského kulturního dědictví. Huť, Bolt Tower, Gong, Svět techniky – ikonická Ostrava.", discountCode: null, image: "https://images.unsplash.com/photo-1518623001779-ac86b13dc35b?w=1200&q=80" },
+  { id: 14, slug: "dolni-vitkovice", name: "Dolní Vítkovice", category: "aktivity", subcategory: "pamatka", tags: ["industriální", "prohlídky", "kultura"], address: "Vítkovice 3004, 703 00 Ostrava-Vítkovice", district: "Vítkovice", shortDesc: "Legendární průmyslový areál zapsaný v seznamu Evropského kulturního dědictví. Huť, Bolt Tower, Gong, Svět techniky – ikonická Ostrava.", discountCode: null, image: "https://images.unsplash.com/photo-1577720580479-7d839d829c73?w=1200&q=80" },
   { id: 15, slug: "slezskoostravsky-hrad", name: "Slezskoostravský hrad", category: "aktivity", subcategory: "pamatka", tags: ["hrad", "historie", "výhledy"], address: "Hradní 1, 710 00 Slezská Ostrava", district: "Slezská Ostrava", shortDesc: "Gotický hrad ze 13. století nad soutokem Ostravice a Lučiny. Prohlídky, výstavy, letní koncerty i středověká hospoda na nádvoří.", discountCode: null, image: "https://images.unsplash.com/photo-1533154683836-84ea7a0bc310?w=1200&q=80" },
   { id: 16, slug: "landek-park", name: "Landek Park", category: "aktivity", subcategory: "galerie", tags: ["muzeum", "hornictví", "prohlídky"], address: "Pod Landekem 64, 725 29 Ostrava-Petřkovice", district: "Petřkovice", shortDesc: "Největší hornické muzeum v ČR. Fárání do podzemí s bývalými horníky, venkovní expozice techniky a krásné procházky v CHKO Landek.", discountCode: null, image: "https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?w=1200&q=80" },
   { id: 17, slug: "galerie-vytvarneho-umeni", name: "Galerie výtvarného umění (GVUO)", category: "aktivity", subcategory: "galerie", tags: ["umění", "výstavy", "Dům umění"], address: "Jurečkova 9, 702 00 Moravská Ostrava", district: "Moravská Ostrava", shortDesc: "Největší sbírkotvorná galerie v Moravskoslezském kraji. Stálá expozice českého umění i rotující výstavy v krásném Domě umění.", discountCode: null, image: "https://images.unsplash.com/photo-1577720580479-7d839d829c73?w=1200&q=80" },

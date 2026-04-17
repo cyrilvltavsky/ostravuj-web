@@ -38,10 +38,31 @@ export function Footer() {
             <h5 className="mb-4 text-xs font-bold uppercase tracking-wider text-ink">
               Projekt
             </h5>
-            <ul className="space-y-1 text-sm text-ink-muted">
-              <li className="py-1">O Ostravuj</li>
-              <li className="py-1">Navrhni místo</li>
-              <li className="py-1">Kontakt</li>
+            <ul className="space-y-1 text-sm">
+              <li>
+                <Link
+                  href="/o-ostravuj"
+                  className="block py-1 text-ink-muted transition-colors hover:text-ink"
+                >
+                  O Ostravuj
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/navrh-misto"
+                  className="block py-1 text-ink-muted transition-colors hover:text-ink"
+                >
+                  Navrhni místo
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/kontakt"
+                  className="block py-1 text-ink-muted transition-colors hover:text-ink"
+                >
+                  Kontakt
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -56,8 +77,19 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-line pt-6 text-center text-xs text-ink-light">
-          © 2026 Ostravuj · Vyrobeno s láskou k Ostravě
+        <div className="space-y-2 border-t border-line pt-6 text-center text-xs text-ink-light">
+          <p>© 2026 Ostravuj · Vyrobeno s láskou k Ostravě</p>
+          <p>
+            tvorba webu{" "}
+            <a
+              href="http://ctyrimedia.cz"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-ink-muted transition-colors hover:text-ink"
+            >
+              čtyři.media
+            </a>
+          </p>
         </div>
       </div>
     </footer>

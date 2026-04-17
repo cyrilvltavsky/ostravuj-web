@@ -35,9 +35,6 @@ export default function HomePage() {
           }}
         />
         <div className="container-page">
-          <span className="mb-5 inline-block rounded-full bg-mint px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wider text-mint-deep">
-            Kurátorský průvodce Ostravou
-          </span>
           <h1 className="mb-6 max-w-[820px] text-[clamp(40px,7vw,72px)] font-extrabold leading-[1.05] tracking-[-0.035em] text-ink">
             Objevuj nejlepší místa
             <br />

@@ -42,9 +42,15 @@ export function Header() {
           Ostravuj
         </Link>
 
-        <nav className="hidden gap-1 md:flex">
-          <Link href="/" className={navLinkClass(pathname === "/")}>
-            Domů
+        <nav className="hidden items-center gap-1 md:flex">
+          <Link
+            href="/"
+            className={`flex items-center justify-center rounded-xl p-2.5 transition-colors ${
+              pathname === "/" ? "bg-surface text-ink" : "text-ink-muted hover:bg-surface hover:text-ink"
+            }`}
+            aria-label="Domů"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
           </Link>
           {CATEGORIES.map((cat) => (
             <Link
