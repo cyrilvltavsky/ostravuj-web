@@ -70,9 +70,23 @@ export function Footer() {
             <h5 className="mb-4 text-xs font-bold uppercase tracking-wider text-ink">
               Právní
             </h5>
-            <ul className="space-y-1 text-sm text-ink-muted">
-              <li className="py-1">Zásady ochrany</li>
-              <li className="py-1">Cookies</li>
+            <ul className="space-y-1 text-sm">
+              <li>
+                <Link
+                  href="/ochrana-osobnich-udaju"
+                  className="block py-1 text-ink-muted transition-colors hover:text-ink"
+                >
+                  Ochrana osobních údajů
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/cookies"
+                  className="block py-1 text-ink-muted transition-colors hover:text-ink"
+                >
+                  Cookies
+                </Link>
+              </li>
             </ul>
           </div>
         </div>

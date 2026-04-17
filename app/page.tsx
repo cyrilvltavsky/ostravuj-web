@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AnimateOnScroll } from "@/components/animate-on-scroll";
 import { CategoryCard } from "@/components/category-card";
 import { PlaceCard } from "@/components/place-card";
 import { BigRandomButton, HeroRandomButton } from "@/components/random-picker";
@@ -62,12 +63,10 @@ export default function HomePage() {
       <section className="py-10 pb-20">
         <div className="container-page">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {CATEGORIES.map((cat) => (
-              <CategoryCard
-                key={cat.slug}
-                category={cat}
-                count={counts[cat.slug]}
-              />
+            {CATEGORIES.map((cat, i) => (
+              <AnimateOnScroll key={cat.slug} delay={i * 80}>
+                <CategoryCard category={cat} count={counts[cat.slug]} />
+              </AnimateOnScroll>
             ))}
           </div>
         </div>
@@ -76,63 +75,71 @@ export default function HomePage() {
       {/* FEATURED */}
       <section className="pb-20 pt-10">
         <div className="container-page">
-          <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <h2 className="text-[clamp(28px,4vw,40px)] font-extrabold leading-tight tracking-tight text-ink">
-                Doporučená místa
-              </h2>
-              <p className="mt-2 text-base text-ink-muted">
-                Ručně vybraný výběr toho nejlepšího v Ostravě a Porubě
-              </p>
+          <AnimateOnScroll>
+            <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+              <div>
+                <h2 className="text-[clamp(28px,4vw,40px)] font-extrabold leading-tight tracking-tight text-ink">
+                  Doporučená místa
+                </h2>
+                <p className="mt-2 text-base text-ink-muted">
+                  Ručně vybraný výběr toho nejlepšího v Ostravě a Porubě
+                </p>
+              </div>
+              <Link
+                href={{ pathname: "/gastro" }}
+                className="group inline-flex items-center gap-1.5 text-sm font-semibold text-ink transition-all"
+              >
+                Zobrazit vše{" "}
+                <span className="transition-all group-hover:translate-x-1">
+                  →
+                </span>
+              </Link>
             </div>
-            <Link
-              href={{ pathname: "/gastro" }}
-              className="group inline-flex items-center gap-1.5 text-sm font-semibold text-ink transition-all"
-            >
-              Zobrazit vše{" "}
-              <span className="transition-all group-hover:translate-x-1">→</span>
-            </Link>
-          </div>
+          </AnimateOnScroll>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {featured.map((place) => (
-              <PlaceCard key={place.slug} place={place} />
+            {featured.map((place, i) => (
+              <AnimateOnScroll key={place.slug} delay={i * 100}>
+                <PlaceCard place={place} />
+              </AnimateOnScroll>
             ))}
           </div>
         </div>
       </section>
 
       {/* RANDOM CTA */}
-      <section className="py-20">
-        <div className="container-page">
-          <div className="relative overflow-hidden rounded-card-xl bg-gradient-to-br from-[#fff7ed] via-[#fef3f2] to-[#f5f3ff] px-14 py-16 text-center">
-            <span
-              aria-hidden
-              className="absolute left-14 top-10 text-2xl opacity-60"
-            >
-              ✨
-            </span>
-            <span
-              aria-hidden
-              className="absolute bottom-10 right-14 text-2xl opacity-60"
-            >
-              ✨
-            </span>
-            <span className="text-[13px] font-bold uppercase tracking-wider text-peach-deep">
-              Nevíš kam?
-            </span>
-            <h2 className="mb-3.5 mt-3 text-[clamp(28px,5vw,44px)] font-extrabold tracking-tight text-ink">
-              Nech se překvapit
-            </h2>
-            <p className="mx-auto mb-8 max-w-[500px] text-[17px] text-ink-muted">
-              Máme pro tebe {total} ověřených míst. Klikni a my ti jedno náhodně
-              vybereme – třeba objevíš něco, co bys sám nenašel.
-            </p>
-            <BigRandomButton>
-              <span>🎲</span> Vybrat náhodně
-            </BigRandomButton>
+      <AnimateOnScroll>
+        <section className="py-20">
+          <div className="container-page">
+            <div className="relative overflow-hidden rounded-card-xl bg-gradient-to-br from-[#fff7ed] via-[#fef3f2] to-[#f5f3ff] px-14 py-16 text-center">
+              <span
+                aria-hidden
+                className="absolute left-14 top-10 text-2xl opacity-60"
+              >
+                ✨
+              </span>
+              <span
+                aria-hidden
+                className="absolute bottom-10 right-14 text-2xl opacity-60"
+              >
+                ✨
+              </span>
+              <span className="text-[13px] font-bold uppercase tracking-wider text-peach-deep">
+                Nevíš kam?
+              </span>
+              <h2 className="mb-3.5 mt-3 text-[clamp(28px,5vw,44px)] font-extrabold tracking-tight text-ink">
+                Nech se překvapit
+              </h2>
+              <p className="mx-auto mb-8 max-w-[500px] text-[17px] text-ink-muted">
+                Máme pro tebe {total} ověřených míst. Klikni a my ti jedno
+                náhodně vybereme. Třeba objevíš něco, co bys sám nenašel.
+              </p>
+              <BigRandomButton>
+                <span>🎲</span> Vybrat náhodně
+              </BigRandomButton>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </AnimateOnScroll>
     </>
   );
 }

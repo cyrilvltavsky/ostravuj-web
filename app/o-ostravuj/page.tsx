@@ -32,23 +32,23 @@ export default function AboutPage() {
           <p>
             Tohle je náš pokus o&nbsp;odpověď. <strong className="text-ink">Ostravuj je
             kurátorský, velmi subjektivní výběr míst, která v&nbsp;Ostravě
-            milujeme.</strong> Žádný algoritmus, žádné placené zápisy &mdash;
-            jen osobní zkušenost a&nbsp;chuť sdílet to nejlepší z&nbsp;města,
-            které si víc pozornosti zaslouží.
+            milujeme.</strong> Žádný algoritmus, jen osobní zkušenost
+            a&nbsp;chuť sdílet to nejlepší z&nbsp;města, které si víc
+            pozornosti zaslouží.
           </p>
 
           <p>
-            Najdete tu restaurace, kde se opravdu dobře jí. Kavárny, kam se
-            chodíme vracet. Památky, galerie a&nbsp;místa, která vás překvapí.
-            Tipy na rande i&nbsp;výlety, které nic nestojí. Každé místo jsme
-            navštívili, vyzkoušeli a&nbsp;pak se rozhodli, jestli si zaslouží být
-            na seznamu.
+            Procházíme restaurace, kavárny, hospody, galerie i&nbsp;skrytá
+            zákoutí a&nbsp;vybíráme jen ta místa, u&nbsp;kterých víme, že
+            nezklamou. Každý tip prošel naší osobní zkouškou. Pokud se tu
+            místo ocitlo, znamená to, že jsme ho sami zažili a&nbsp;rádi
+            bychom ho zažili znovu.
           </p>
 
           <p>
             Netvrdíme, že máme pravdu. Tvrdíme, že za každým tipem stojí
-            skutečný zážitek &mdash; a&nbsp;že je lepší mít pár ověřených
-            doporučení než nekonečný seznam průměrných míst.
+            skutečný zážitek a&nbsp;že pár ověřených doporučení má větší cenu
+            než nekonečný seznam průměrných míst.
           </p>
 
           <p>
