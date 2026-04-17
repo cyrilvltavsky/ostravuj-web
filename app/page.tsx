@@ -3,6 +3,7 @@ import { AnimateOnScroll } from "@/components/animate-on-scroll";
 import { CategoryCard } from "@/components/category-card";
 import { PlaceCard } from "@/components/place-card";
 import { BigRandomButton, HeroRandomButton } from "@/components/random-picker";
+import { Typewriter } from "@/components/typewriter";
 import {
   CATEGORIES,
   PLACES,
@@ -47,7 +48,7 @@ export default function HomePage() {
           </p>
           <div className="flex flex-wrap gap-3">
             <HeroRandomButton>
-              <span>🎲</span> Překvap mě
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="1"/><circle cx="15" cy="9" r="1"/><circle cx="9" cy="15" r="1"/><circle cx="15" cy="15" r="1"/></svg> Překvap mě
             </HeroRandomButton>
             <Link
               href={{ pathname: "/gastro" }}
@@ -113,28 +114,28 @@ export default function HomePage() {
             <div className="relative overflow-hidden rounded-card-xl bg-gradient-to-br from-[#fff7ed] via-[#fef3f2] to-[#f5f3ff] px-14 py-16 text-center">
               <span
                 aria-hidden
-                className="absolute left-14 top-10 text-2xl opacity-60"
+                className="absolute left-14 top-10 opacity-60"
               >
-                ✨
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-peach-strong"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
               </span>
               <span
                 aria-hidden
-                className="absolute bottom-10 right-14 text-2xl opacity-60"
+                className="absolute bottom-10 right-14 opacity-60"
               >
-                ✨
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-violet-400"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
               </span>
               <span className="text-[13px] font-bold uppercase tracking-wider text-peach-deep">
                 Nevíš kam?
               </span>
               <h2 className="mb-3.5 mt-3 text-[clamp(28px,5vw,44px)] font-extrabold tracking-tight text-ink">
-                Nech se překvapit
+                <Typewriter text="Objevuj nejlepší místa v Ostravě" speed={50} />
               </h2>
               <p className="mx-auto mb-8 max-w-[500px] text-[17px] text-ink-muted">
                 Máme pro tebe {total} ověřených míst. Klikni a my ti jedno
                 náhodně vybereme. Třeba objevíš něco, co bys sám nenašel.
               </p>
               <BigRandomButton>
-                <span>🎲</span> Vybrat náhodně
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="1"/><circle cx="15" cy="9" r="1"/><circle cx="9" cy="15" r="1"/><circle cx="15" cy="15" r="1"/></svg> Vybrat náhodně
               </BigRandomButton>
             </div>
           </div>

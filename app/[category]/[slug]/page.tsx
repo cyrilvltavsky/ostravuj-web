@@ -70,7 +70,7 @@ export default async function PlaceDetailPage({
             {place.name}
           </h1>
           <p className="flex items-center gap-2 text-[17px] text-ink-muted">
-            <span aria-hidden>📍</span>
+            <span aria-hidden><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="inline -mt-0.5"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></span>
             <span>{place.address}</span>
           </p>
         </div>
@@ -140,7 +140,7 @@ export default async function PlaceDetailPage({
                 rel="noopener noreferrer"
                 className="flex w-full items-center justify-center gap-2.5 rounded-xl bg-ink px-5 py-3.5 text-[15px] font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#1f2937]"
               >
-                <span aria-hidden>🗺️</span> Navigovat přes Google Maps
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg> Navigovat přes Google Maps
               </a>
             </div>
 

@@ -118,7 +118,7 @@ export function RandomPickerProvider({ children }: { children: React.ReactNode }
                 onClick={reroll}
                 className="flex flex-1 items-center justify-center gap-2 rounded-[14px] border border-line-hover bg-white px-6 py-3.5 text-[15px] font-semibold text-ink transition hover:-translate-y-0.5 hover:bg-surface"
               >
-                <span>🎲</span> Zkusit znovu
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="1"/><circle cx="15" cy="9" r="1"/><circle cx="9" cy="15" r="1"/><circle cx="15" cy="15" r="1"/></svg> Zkusit znovu
               </button>
               <button
                 type="button"
@@ -141,9 +141,9 @@ export function RandomButton() {
     <button
       type="button"
       onClick={open}
-      className="inline-flex items-center gap-2 rounded-xl bg-ink px-4 py-2.5 text-sm font-medium text-white transition hover:-translate-y-0.5 hover:bg-[#1f2937]"
+      className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-peach-strong to-rose-strong px-4 py-2.5 text-sm font-medium text-white transition hover:-translate-y-0.5 hover:shadow-soft-md"
     >
-      <span>🎲</span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="1"/><circle cx="15" cy="9" r="1"/><circle cx="9" cy="15" r="1"/><circle cx="15" cy="15" r="1"/></svg>
       <span className="hidden sm:inline">Náhodný výběr</span>
     </button>
   );
@@ -155,7 +155,7 @@ export function HeroRandomButton({ children }: { children: React.ReactNode }) {
     <button
       type="button"
       onClick={open}
-      className="inline-flex items-center gap-2.5 rounded-[14px] bg-ink px-6 py-3.5 text-[15px] font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#1f2937] hover:shadow-soft-md"
+      className="inline-flex items-center gap-2.5 rounded-[14px] bg-gradient-to-r from-peach-strong to-rose-strong px-6 py-3.5 text-[15px] font-semibold text-white transition hover:-translate-y-0.5 hover:shadow-soft-md"
     >
       {children}
     </button>
@@ -168,7 +168,7 @@ export function BigRandomButton({ children }: { children: React.ReactNode }) {
     <button
       type="button"
       onClick={open}
-      className="inline-flex items-center gap-2.5 rounded-[14px] bg-ink px-8 py-4 text-base font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#1f2937] hover:shadow-soft-md"
+      className="inline-flex items-center gap-2.5 rounded-[14px] bg-gradient-to-r from-peach-strong to-rose-strong px-8 py-4 text-base font-semibold text-white transition hover:-translate-y-0.5 hover:shadow-soft-md"
     >
       {children}
     </button>

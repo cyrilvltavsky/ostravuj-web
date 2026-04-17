@@ -13,7 +13,7 @@ export function CategoryCard({ category, count }: CategoryCardProps) {
       href={{ pathname: `/${category.slug}` }}
       className="group block overflow-hidden rounded-card-lg border border-line bg-white transition-all hover:-translate-y-1 hover:border-transparent hover:shadow-soft-lg"
     >
-      <div className="relative aspect-[3/2] overflow-hidden bg-surface">
+      <div className="relative aspect-[4/3] overflow-hidden bg-surface">
         <Image
           src={category.image}
           alt={category.title}

@@ -100,15 +100,15 @@ export default function ContactPage() {
           <div className="mt-10 relative overflow-hidden rounded-card-xl bg-gradient-to-br from-[#fff7ed] via-[#fef3f2] to-[#f5f3ff] p-8 text-center shadow-soft md:p-10">
             <span
               aria-hidden
-              className="absolute left-8 top-6 text-xl opacity-50"
+              className="absolute left-8 top-6 opacity-50"
             >
-              ✨
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-peach-strong"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
             </span>
             <span
               aria-hidden
-              className="absolute bottom-6 right-8 text-xl opacity-50"
+              className="absolute bottom-6 right-8 opacity-50"
             >
-              ✨
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-violet-400"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
             </span>
             <h3 className="text-[clamp(20px,3vw,28px)] font-extrabold tracking-tight text-ink">
               Máte tip na další místo?

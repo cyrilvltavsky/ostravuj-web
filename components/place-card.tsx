@@ -24,7 +24,7 @@ export function PlaceCard({ place }: PlaceCardProps) {
         />
         {place.discountCode ? (
           <span className="absolute left-3.5 top-3.5 rounded-full bg-peach-strong px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-white backdrop-blur">
-            💸 Sleva
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="inline -mt-px mr-0.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>{" "}Sleva
           </span>
         ) : (
           <span className="absolute left-3.5 top-3.5 rounded-full bg-white/90 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-ink backdrop-blur">
