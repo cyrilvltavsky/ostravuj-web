@@ -11,8 +11,8 @@ export function Footer() {
               Ostravuj
             </div>
             <p className="mt-3 max-w-xs text-sm leading-relaxed text-ink-muted">
-              Kurátorský průvodce po nejlepších místech v Ostravě. Ručně
-              vybíráme jen to, co stojí za to.
+              Kurátorský průvodce po nejlepších místech v Ostravě. Osobně
+              vybíráme jen ta místa, která za to stojí.
             </p>
           </div>
 
@@ -92,9 +92,8 @@ export function Footer() {
         </div>
 
         <div className="space-y-2 border-t border-line pt-6 text-center text-xs text-ink-light">
-          <p>© 2026 Ostravuj · Vyrobeno s láskou k Ostravě</p>
           <p>
-            tvorba webu{" "}
+            Vyrobeno s láskou v Ostravě od{" "}
             <a
               href="http://ctyrimedia.cz"
               target="_blank"
