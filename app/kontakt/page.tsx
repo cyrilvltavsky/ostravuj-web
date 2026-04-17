@@ -53,10 +53,10 @@ export default function ContactPage() {
               }}
             />
 
-            <div className="relative flex flex-col items-center gap-8 p-8 sm:flex-row sm:items-start md:p-10">
+            <div className="relative flex flex-col items-center gap-8 p-8 sm:flex-row-reverse sm:items-center md:p-10">
               {/* PHOTO */}
               <div className="shrink-0">
-                <div className="relative h-28 w-28 overflow-hidden rounded-full border-4 border-white shadow-soft-lg sm:h-32 sm:w-32">
+                <div className="relative h-36 w-36 overflow-hidden rounded-full border-4 border-white shadow-soft-lg sm:h-40 sm:w-40">
                   <Image
                     src="/cyril.jpg"
                     alt="Cyril Vltavský"
@@ -67,7 +67,7 @@ export default function ContactPage() {
               </div>
 
               {/* DETAILS */}
-              <div className="text-center sm:text-left">
+              <div className="flex-1 text-center sm:text-left">
                 <h2 className="text-gradient text-[clamp(24px,4vw,32px)] font-extrabold tracking-tight">
                   Cyril Vltavský
                 </h2>
