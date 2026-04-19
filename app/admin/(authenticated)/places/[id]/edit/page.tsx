@@ -62,7 +62,12 @@ export default async function EditPlacePage({
           name: place.name,
           slug: place.slug,
           categoryId: place.categoryId,
+          categorySlugs:
+            place.categorySlugs.length > 0
+              ? place.categorySlugs
+              : [place.category.slug],
           subcategory: place.subcategory,
+          subcategories: place.subcategories,
           district: place.district,
           address: place.address,
           shortDesc: place.shortDesc,

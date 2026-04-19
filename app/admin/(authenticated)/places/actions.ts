@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { requireEditor } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import {
@@ -10,6 +11,11 @@ import {
   ensurePlacePhotosBucket,
   uploadPhoto,
 } from "@/lib/supabase/storage";
+import {
+  normalizeFacebookUrl,
+  normalizeInstagramHandle,
+  normalizeWebsiteUrl,
+} from "@/lib/url-normalize";
 
 export type PlaceFormState = {
   error: string | null;
@@ -26,7 +32,7 @@ function slugify(s: string): string {
     .slice(0, 80);
 }
 
-function parseTags(input: string): string[] {
+function parseList(input: string): string[] {
   return input
     .split(",")
     .map((s) => s.trim())
@@ -37,19 +43,25 @@ function readFormPlace(formData: FormData) {
   const name = String(formData.get("name") ?? "").trim();
   const slugInput = String(formData.get("slug") ?? "").trim();
   const slug = slugInput ? slugify(slugInput) : slugify(name);
-  const categoryId = Number(formData.get("categoryId"));
-  const subcategory = String(formData.get("subcategory") ?? "").trim() || null;
+  const categoryId = Number(formData.get("categoryId")) || 0;
+  const categorySlugs = parseList(String(formData.get("categorySlugs") ?? ""));
+  const subcategories = parseList(
+    String(formData.get("subcategories") ?? ""),
+  );
+  const subcategory = subcategories[0] ?? null;
   const district = String(formData.get("district") ?? "").trim() || null;
   const address = String(formData.get("address") ?? "").trim();
   const shortDesc = String(formData.get("shortDesc") ?? "").trim();
   const description =
     String(formData.get("description") ?? "").trim() || shortDesc;
-  const tags = parseTags(String(formData.get("tags") ?? ""));
+  const tags = parseList(String(formData.get("tags") ?? ""));
   const phone = String(formData.get("phone") ?? "").trim() || null;
   const email = String(formData.get("email") ?? "").trim() || null;
-  const website = String(formData.get("website") ?? "").trim() || null;
-  const instagram = String(formData.get("instagram") ?? "").trim() || null;
-  const facebook = String(formData.get("facebook") ?? "").trim() || null;
+  const website = normalizeWebsiteUrl(String(formData.get("website") ?? ""));
+  const instagram = normalizeInstagramHandle(
+    String(formData.get("instagram") ?? ""),
+  );
+  const facebook = normalizeFacebookUrl(String(formData.get("facebook") ?? ""));
   const showContacts = formData.get("showContacts") === "on";
   const showDiscount = formData.get("showDiscount") === "on";
   const featured = formData.get("featured") === "on";
@@ -64,7 +76,9 @@ function readFormPlace(formData: FormData) {
     name,
     slug,
     categoryId,
+    categorySlugs,
     subcategory,
+    subcategories,
     district,
     address,
     shortDesc,
@@ -88,7 +102,8 @@ function validate(d: ReturnType<typeof readFormPlace>): string | null {
   if (!d.slug) return "Slug nemůže být prázdný.";
   if (!d.address) return "Vyplňte adresu.";
   if (!d.shortDesc) return "Vyplňte krátký popis.";
-  if (!d.categoryId) return "Vyberte kategorii.";
+  if (!d.categoryId || d.categorySlugs.length === 0)
+    return "Vyberte alespoň jednu kategorii.";
   return null;
 }
 
@@ -115,90 +130,112 @@ async function uploadPhotos(
   return results;
 }
 
+/** Wrap an action body so that any thrown error becomes a friendly state.
+ *  Re-throws Next.js redirect signals so navigation still works. */
+function asActionError(label: string, e: unknown): PlaceFormState {
+  if (isRedirectError(e)) throw e;
+  console.error(`[${label}]`, e);
+  const message = e instanceof Error ? e.message : "Neznámá chyba.";
+  return { error: `${label}: ${message}` };
+}
+
 export async function createPlace(
   _prev: PlaceFormState,
   formData: FormData,
 ): Promise<PlaceFormState> {
-  const profile = await requireEditor();
-  const data = readFormPlace(formData);
+  let profile;
+  let data;
+  try {
+    profile = await requireEditor();
+    data = readFormPlace(formData);
+  } catch (e) {
+    return asActionError("Vstupní data", e);
+  }
+
   const err = validate(data);
   if (err) return { error: err };
 
-  // Slug uniqueness — auto-suffix if taken
-  let finalSlug = data.slug;
-  let suffix = 2;
-  while (await prisma.place.findUnique({ where: { slug: finalSlug } })) {
-    finalSlug = `${data.slug}-${suffix++}`;
-  }
-
-  const place = await prisma.place.create({
-    data: {
-      slug: finalSlug,
-      name: data.name,
-      address: data.address,
-      district: data.district,
-      subcategory: data.subcategory,
-      shortDesc: data.shortDesc,
-      description: data.description,
-      categoryId: data.categoryId,
-      tags: data.tags,
-      phone: data.phone,
-      email: data.email,
-      website: data.website,
-      instagram: data.instagram,
-      facebook: data.facebook,
-      showContacts: data.showContacts,
-      showDiscount: data.showDiscount,
-      featured: data.featured,
-      status: data.status,
-      createdById: profile.id,
-    },
-  });
-
-  // Photos
   try {
-    const photos = await uploadPhotos(place.id, formData);
-    if (photos.length > 0) {
-      await prisma.placePhoto.createMany({
-        data: photos.map((p) => ({
-          placeId: place.id,
-          url: p.url,
-          sortOrder: p.sortOrder,
-        })),
+    // Slug uniqueness — auto-suffix if taken
+    let finalSlug = data.slug;
+    let suffix = 2;
+    while (await prisma.place.findUnique({ where: { slug: finalSlug } })) {
+      finalSlug = `${data.slug}-${suffix++}`;
+    }
+
+    const place = await prisma.place.create({
+      data: {
+        slug: finalSlug,
+        name: data.name,
+        address: data.address,
+        district: data.district,
+        subcategory: data.subcategory,
+        subcategories: data.subcategories,
+        categorySlugs: data.categorySlugs,
+        shortDesc: data.shortDesc,
+        description: data.description,
+        categoryId: data.categoryId,
+        tags: data.tags,
+        phone: data.phone,
+        email: data.email,
+        website: data.website,
+        instagram: data.instagram,
+        facebook: data.facebook,
+        showContacts: data.showContacts,
+        showDiscount: data.showDiscount,
+        featured: data.featured,
+        status: data.status,
+        createdById: profile.id,
+      },
+    });
+
+    // Photos
+    try {
+      const photos = await uploadPhotos(place.id, formData);
+      if (photos.length > 0) {
+        await prisma.placePhoto.createMany({
+          data: photos.map((p) => ({
+            placeId: place.id,
+            url: p.url,
+            sortOrder: p.sortOrder,
+          })),
+        });
+      }
+    } catch (e) {
+      console.error("[createPlace.photos]", e);
+      return {
+        error: e instanceof Error ? e.message : "Nahrání fotek selhalo.",
+      };
+    }
+
+    if (data.discountCode) {
+      await prisma.discountCode.create({
+        data: { placeId: place.id, code: data.discountCode },
       });
     }
-  } catch (e) {
-    return {
-      error: e instanceof Error ? e.message : "Nahrání fotek selhalo.",
-    };
-  }
 
-  // Discount code
-  if (data.discountCode) {
-    await prisma.discountCode.create({
-      data: { placeId: place.id, code: data.discountCode },
+    await prisma.auditLog.create({
+      data: {
+        actorId: profile.id,
+        action: "CREATE",
+        entityType: "Place",
+        entityId: place.id,
+        metadata: { name: place.name, slug: place.slug },
+      },
     });
+
+    const category = await prisma.category.findUnique({
+      where: { id: place.categoryId },
+      select: { slug: true },
+    });
+
+    revalidatePath("/admin/places");
+    revalidatePath("/");
+    if (category) revalidatePath(`/${category.slug}/${place.slug}`);
+    redirect(`/admin/places/${place.id}/edit?saved=1`);
+  } catch (e) {
+    return asActionError("Vytvoření místa selhalo", e);
   }
-
-  await prisma.auditLog.create({
-    data: {
-      actorId: profile.id,
-      action: "CREATE",
-      entityType: "Place",
-      entityId: place.id,
-      metadata: { name: place.name, slug: place.slug },
-    },
-  });
-
-  const category = await prisma.category.findUnique({
-    where: { id: place.categoryId },
-    select: { slug: true },
-  });
-
-  revalidatePath("/admin/places");
-  revalidatePath("/");
-  if (category) revalidatePath(`/${category.slug}/${place.slug}`);
-  redirect(`/admin/places/${place.id}/edit?saved=1`);
 }
 
 export async function updatePlace(
@@ -206,65 +243,71 @@ export async function updatePlace(
   _prev: PlaceFormState,
   formData: FormData,
 ): Promise<PlaceFormState> {
-  const profile = await requireEditor();
-  const data = readFormPlace(formData);
+  let profile;
+  let data;
+  try {
+    profile = await requireEditor();
+    data = readFormPlace(formData);
+  } catch (e) {
+    return asActionError("Vstupní data", e);
+  }
+
   const err = validate(data);
   if (err) return { error: err };
 
-  const existing = await prisma.place.findUnique({
-    where: { id },
-    include: { discountCode: true, category: true },
-  });
-  if (!existing) return { error: "Místo nenalezeno." };
-
-  // Slug uniqueness if changed
-  let finalSlug = data.slug;
-  if (finalSlug !== existing.slug) {
-    let suffix = 2;
-    while (
-      await prisma.place.findFirst({
-        where: { slug: finalSlug, NOT: { id } },
-      })
-    ) {
-      finalSlug = `${data.slug}-${suffix++}`;
-    }
-  }
-
-  await prisma.place.update({
-    where: { id },
-    data: {
-      slug: finalSlug,
-      name: data.name,
-      address: data.address,
-      district: data.district,
-      subcategory: data.subcategory,
-      shortDesc: data.shortDesc,
-      description: data.description,
-      categoryId: data.categoryId,
-      tags: data.tags,
-      phone: data.phone,
-      email: data.email,
-      website: data.website,
-      instagram: data.instagram,
-      facebook: data.facebook,
-      showContacts: data.showContacts,
-      showDiscount: data.showDiscount,
-      featured: data.featured,
-      status: data.status,
-    },
-  });
-
-  // Photos — only ADD new uploads, keep existing
   try {
-    const newPhotos = await uploadPhotos(id, formData);
-    if (newPhotos.length > 0) {
-      // Replace photos at the same sortOrder slot
+    const existing = await prisma.place.findUnique({
+      where: { id },
+      include: { discountCode: true, category: true },
+    });
+    if (!existing) return { error: "Místo nenalezeno." };
+
+    let finalSlug = data.slug;
+    if (finalSlug !== existing.slug) {
+      let suffix = 2;
+      while (
+        await prisma.place.findFirst({
+          where: { slug: finalSlug, NOT: { id } },
+        })
+      ) {
+        finalSlug = `${data.slug}-${suffix++}`;
+      }
+    }
+
+    await prisma.place.update({
+      where: { id },
+      data: {
+        slug: finalSlug,
+        name: data.name,
+        address: data.address,
+        district: data.district,
+        subcategory: data.subcategory,
+        subcategories: data.subcategories,
+        categorySlugs: data.categorySlugs,
+        shortDesc: data.shortDesc,
+        description: data.description,
+        categoryId: data.categoryId,
+        tags: data.tags,
+        phone: data.phone,
+        email: data.email,
+        website: data.website,
+        instagram: data.instagram,
+        facebook: data.facebook,
+        showContacts: data.showContacts,
+        showDiscount: data.showDiscount,
+        featured: data.featured,
+        status: data.status,
+      },
+    });
+
+    // Photos — only ADD/REPLACE the slots the user actually uploaded
+    try {
+      const newPhotos = await uploadPhotos(id, formData);
       for (const p of newPhotos) {
         const existingAtSlot = await prisma.placePhoto.findFirst({
           where: { placeId: id, sortOrder: p.sortOrder },
         });
         if (existingAtSlot) {
-          // delete old file from storage, replace DB row
           await deletePhotoByUrl(PLACE_PHOTOS_BUCKET, existingAtSlot.url);
           await prisma.placePhoto.update({
             where: { id: existingAtSlot.id },
@@ -276,42 +319,44 @@ export async function updatePlace(
           });
         }
       }
+    } catch (e) {
+      console.error("[updatePlace.photos]", e);
+      return {
+        error: e instanceof Error ? e.message : "Nahrání fotek selhalo.",
+      };
     }
-  } catch (e) {
-    return {
-      error: e instanceof Error ? e.message : "Nahrání fotek selhalo.",
-    };
-  }
 
-  // Discount code
-  if (data.discountCode) {
-    await prisma.discountCode.upsert({
-      where: { placeId: id },
-      create: { placeId: id, code: data.discountCode },
-      update: { code: data.discountCode },
+    if (data.discountCode) {
+      await prisma.discountCode.upsert({
+        where: { placeId: id },
+        create: { placeId: id, code: data.discountCode },
+        update: { code: data.discountCode },
+      });
+    } else if (existing.discountCode) {
+      await prisma.discountCode.delete({ where: { placeId: id } });
+    }
+
+    await prisma.auditLog.create({
+      data: {
+        actorId: profile.id,
+        action: "UPDATE",
+        entityType: "Place",
+        entityId: id,
+        metadata: { name: data.name, slug: finalSlug },
+      },
     });
-  } else if (existing.discountCode) {
-    await prisma.discountCode.delete({ where: { placeId: id } });
+
+    revalidatePath("/admin/places");
+    revalidatePath("/");
+    revalidatePath(`/${existing.category.slug}/${existing.slug}`);
+    if (finalSlug !== existing.slug) {
+      revalidatePath(`/${existing.category.slug}/${finalSlug}`);
+    }
+
+    return { error: null };
+  } catch (e) {
+    return asActionError("Uložení místa selhalo", e);
   }
-
-  await prisma.auditLog.create({
-    data: {
-      actorId: profile.id,
-      action: "UPDATE",
-      entityType: "Place",
-      entityId: id,
-      metadata: { name: data.name, slug: finalSlug },
-    },
-  });
-
-  revalidatePath("/admin/places");
-  revalidatePath("/");
-  revalidatePath(`/${existing.category.slug}/${existing.slug}`);
-  if (finalSlug !== existing.slug) {
-    revalidatePath(`/${existing.category.slug}/${finalSlug}`);
-  }
-
-  return { error: null };
 }
 
 export async function deletePhotoAtSlot(placeId: string, sortOrder: number) {
@@ -333,7 +378,6 @@ export async function deletePlace(id: string) {
   });
   if (!place) return;
 
-  // Delete photos from storage
   for (const ph of place.photos) {
     await deletePhotoByUrl(PLACE_PHOTOS_BUCKET, ph.url);
   }

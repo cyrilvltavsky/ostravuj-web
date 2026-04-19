@@ -86,6 +86,13 @@ model Place {
   // Tags as a flat string array (Postgres text[]).
   tags String[] @default([])
 
+  // All categories the place belongs to (includes the primary). Drives
+  // listings; the primary categoryId determines the canonical URL slug.
+  categorySlugs String[] @default([]) @map("category_slugs")
+
+  // All subcategories (e.g. ["restaurace", "bistro"]).
+  subcategories String[] @default([])
+
   // Optional contacts shown if showContacts = true and at least one is set.
   phone     String?
   email     String?

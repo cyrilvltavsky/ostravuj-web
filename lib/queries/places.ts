@@ -23,14 +23,15 @@ function loadPlace(slug: string) {
 
 function toPlaceView(p: NonNullable<PlaceWithRelations>): Place {
   const mainPhoto = p.photos[0]?.url ?? "";
+  // Prefer the multi-value subcategories array; fall back to legacy field
+  const firstSub = p.subcategories[0] ?? p.subcategory ?? "restaurace";
 
   return {
-    id: 0, // legacy numeric id no longer used by frontend
+    id: 0,
     slug: p.slug,
     name: p.name,
     category: p.category.slug as CategorySlug,
-    // Default any DB subcategory to a safe known value if missing
-    subcategory: (p.subcategory as Place["subcategory"]) ?? "restaurace",
+    subcategory: firstSub as Place["subcategory"],
     tags: p.tags,
     address: p.address,
     district: p.district ?? "",
@@ -97,8 +98,16 @@ export async function getPlacePhotos(slug: string): Promise<string[]> {
 export async function getPlacesByCategory(
   categorySlug: CategorySlug,
 ): Promise<Place[]> {
+  // Match on the multi-value categorySlugs array (includes the primary
+  // category) so a place can show up in multiple listings.
   const rows = await prisma.place.findMany({
-    where: { status: "PUBLISHED", category: { slug: categorySlug } },
+    where: {
+      status: "PUBLISHED",
+      OR: [
+        { categorySlugs: { has: categorySlug } },
+        { category: { slug: categorySlug } },
+      ],
+    },
     include: {
       category: true,
       photos: { orderBy: { sortOrder: "asc" }, take: 1 },
@@ -156,12 +165,21 @@ export async function getSubcategoriesInCategory(
   categorySlug: CategorySlug,
 ): Promise<string[]> {
   const rows = await prisma.place.findMany({
-    where: { status: "PUBLISHED", category: { slug: categorySlug } },
-    select: { subcategory: true },
+    where: {
+      status: "PUBLISHED",
+      OR: [
+        { categorySlugs: { has: categorySlug } },
+        { category: { slug: categorySlug } },
+      ],
+    },
+    select: { subcategory: true, subcategories: true },
   });
-  return [
-    ...new Set(rows.map((r) => r.subcategory).filter((s): s is string => !!s)),
-  ];
+  const all = new Set<string>();
+  for (const r of rows) {
+    for (const s of r.subcategories) all.add(s);
+    if (r.subcategory) all.add(r.subcategory);
+  }
+  return [...all];
 }
 
 /** Static slugs needed for `generateStaticParams` on detail page */

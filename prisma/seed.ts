@@ -66,8 +66,10 @@ async function main() {
         address: p.address,
         district: p.district,
         subcategory: p.subcategory,
+        subcategories: p.subcategory ? [p.subcategory] : [],
+        categorySlugs: [p.category],
         shortDesc: p.shortDesc,
-        description: p.shortDesc, // zatím použijeme shortDesc i pro description
+        description: p.shortDesc,
         categoryId,
         tags: p.tags,
         featured: featuredSet.has(p.slug as (typeof FEATURED_SLUGS)[number]),

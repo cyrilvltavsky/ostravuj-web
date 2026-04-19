@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { PhotoUploader } from "./photo-uploader";
 import type { PlaceFormState } from "@/app/admin/(authenticated)/places/actions";
 
@@ -14,7 +14,9 @@ export type PlaceFormDefaults = {
   name?: string;
   slug?: string;
   categoryId?: number;
+  categorySlugs?: string[];
   subcategory?: string | null;
+  subcategories?: string[];
   district?: string | null;
   address?: string;
   shortDesc?: string;
@@ -38,16 +40,26 @@ const inputClass =
 
 const labelClass = "mb-1.5 block text-sm font-semibold text-ink";
 
-const subcategoryOptions = [
-  "restaurace",
-  "bistro",
-  "kavarna",
-  "hospoda",
-  "galerie",
-  "pamatka",
-  "rodina",
-  "vyhlidka",
+const SUBCATEGORY_OPTIONS = [
+  { value: "restaurace", label: "Restaurace" },
+  { value: "bistro", label: "Bistro" },
+  { value: "kavarna", label: "Kavárna" },
+  { value: "hospoda", label: "Hospoda" },
+  { value: "galerie", label: "Galerie" },
+  { value: "pamatka", label: "Památka" },
+  { value: "rodina", label: "Rodina" },
+  { value: "vyhlidka", label: "Vyhlídka" },
 ];
+
+function slugifyClient(s: string): string {
+  return s
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80);
+}
 
 export function PlaceForm({
   action,
@@ -66,6 +78,63 @@ export function PlaceForm({
   saved?: boolean;
 }) {
   const [state, formAction, pending] = useActionState(action, initial);
+
+  // Local state — slug auto-syncs with name until user edits it manually
+  const [name, setName] = useState(defaults.name ?? "");
+  const [slug, setSlug] = useState(defaults.slug ?? "");
+  const [slugTouched, setSlugTouched] = useState(Boolean(defaults.slug));
+
+  // Multi-select chips
+  const initialCategorySlugs =
+    defaults.categorySlugs && defaults.categorySlugs.length > 0
+      ? defaults.categorySlugs
+      : defaults.categoryId
+        ? [categories.find((c) => c.id === defaults.categoryId)?.slug].filter(
+            (s): s is string => Boolean(s),
+          )
+        : [];
+  const [selectedCategories, setSelectedCategories] =
+    useState<string[]>(initialCategorySlugs);
+
+  const initialSubcategories =
+    defaults.subcategories && defaults.subcategories.length > 0
+      ? defaults.subcategories
+      : defaults.subcategory
+        ? [defaults.subcategory]
+        : [];
+  const [selectedSubcategories, setSelectedSubcategories] =
+    useState<string[]>(initialSubcategories);
+
+  function handleNameChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const v = e.target.value;
+    setName(v);
+    if (!slugTouched) setSlug(slugifyClient(v));
+  }
+
+  function handleSlugChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setSlug(e.target.value);
+    setSlugTouched(true);
+  }
+
+  function toggleCategory(slug: string) {
+    setSelectedCategories((prev) =>
+      prev.includes(slug) ? prev.filter((s) => s !== slug) : [...prev, slug],
+    );
+  }
+
+  function toggleSubcategory(value: string) {
+    setSelectedSubcategories((prev) =>
+      prev.includes(value)
+        ? prev.filter((s) => s !== value)
+        : [...prev, value],
+    );
+  }
+
+  // The first selected category is the primary one (drives URL).
+  const primaryCategoryId =
+    selectedCategories.length > 0
+      ? categories.find((c) => c.slug === selectedCategories[0])?.id
+      : undefined;
 
   return (
     <form action={formAction} className="space-y-6 pb-12">
@@ -86,53 +155,85 @@ export function PlaceForm({
               type="text"
               name="name"
               required
-              defaultValue={defaults.name ?? ""}
+              value={name}
+              onChange={handleNameChange}
               className={inputClass}
               placeholder="HogoFogo Bistro"
             />
           </Field>
-          <Field label="Slug (URL)" hint="Pokud necháte prázdné, vygeneruje se z názvu">
+          <Field
+            label="Slug (URL)"
+            hint="Generuje se automaticky z názvu — můžete přepsat"
+          >
             <input
               type="text"
               name="slug"
-              defaultValue={defaults.slug ?? ""}
+              value={slug}
+              onChange={handleSlugChange}
               className={inputClass}
               placeholder="hogofogo-bistro"
             />
           </Field>
-          <Field label="Kategorie" required>
-            <select
-              name="categoryId"
-              required
-              defaultValue={defaults.categoryId}
-              className={inputClass}
-            >
-              <option value="">— vyberte —</option>
-              {categories.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-          </Field>
-          <Field label="Subkategorie">
-            <select
-              name="subcategory"
-              defaultValue={defaults.subcategory ?? ""}
-              className={inputClass}
-            >
-              <option value="">— žádná —</option>
-              {subcategoryOptions.map((s) => (
-                <option key={s} value={s}>
-                  {s}
-                </option>
-              ))}
-            </select>
-          </Field>
         </div>
+
+        <Field label="Kategorie" required hint="Klikněte na jednu nebo více kategorií. První zvolená určuje URL.">
+          {/* Hidden field carries the comma-separated slug list to the server */}
+          <input
+            type="hidden"
+            name="categorySlugs"
+            value={selectedCategories.join(",")}
+          />
+          <input
+            type="hidden"
+            name="categoryId"
+            value={primaryCategoryId ?? ""}
+          />
+          <ChipGroup>
+            {categories.map((c, i) => {
+              const active = selectedCategories.includes(c.slug);
+              const isPrimary = active && selectedCategories[0] === c.slug;
+              return (
+                <Chip
+                  key={c.slug}
+                  active={active}
+                  onClick={() => toggleCategory(c.slug)}
+                >
+                  {c.name}
+                  {isPrimary && selectedCategories.length > 1 ? (
+                    <span className="ml-1.5 rounded-full bg-white/30 px-1.5 py-0.5 text-[10px] font-bold uppercase">
+                      hlavní
+                    </span>
+                  ) : null}
+                </Chip>
+              );
+            })}
+          </ChipGroup>
+        </Field>
+
+        <Field label="Subkategorie" hint="Lze vybrat více">
+          <input
+            type="hidden"
+            name="subcategories"
+            value={selectedSubcategories.join(",")}
+          />
+          <ChipGroup>
+            {SUBCATEGORY_OPTIONS.map((opt) => (
+              <Chip
+                key={opt.value}
+                active={selectedSubcategories.includes(opt.value)}
+                onClick={() => toggleSubcategory(opt.value)}
+              >
+                {opt.label}
+              </Chip>
+            ))}
+          </ChipGroup>
+        </Field>
       </Section>
 
-      <Section title="Fotografie" hint="Hlavní fotka + až 5 doplňkových (max 5 MB, JPG/PNG/WEBP)">
+      <Section
+        title="Fotografie"
+        hint="Hlavní fotka + až 5 doplňkových (max 5 MB, JPG/PNG/WEBP)"
+      >
         <PhotoUploader existing={defaults.photos ?? []} placeId={placeId} />
       </Section>
 
@@ -158,7 +259,11 @@ export function PlaceForm({
             />
           </Field>
         </div>
-        <Field label="Krátký popis" required hint="Zobrazí se v kartě i detailu">
+        <Field
+          label="Krátký popis"
+          required
+          hint="Zobrazí se v kartě i detailu"
+        >
           <textarea
             name="shortDesc"
             required
@@ -168,7 +273,10 @@ export function PlaceForm({
             placeholder="Stylové bistro v historickém domě..."
           />
         </Field>
-        <Field label="Tagy" hint="Oddělené čárkami, např. lokální suroviny, zahrádka, brunch">
+        <Field
+          label="Tagy"
+          hint="Oddělené čárkami, např. lokální suroviny, zahrádka, brunch"
+        >
           <input
             type="text"
             name="tags"
@@ -179,7 +287,10 @@ export function PlaceForm({
         </Field>
       </Section>
 
-      <Section title="Kontakty" hint="Volitelné — zobrazí se na detailu pokud je zaškrtnuto níže">
+      <Section
+        title="Kontakty"
+        hint="Volitelné — URL adresy lze zadat i bez https://"
+      >
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="Telefon">
             <input
@@ -199,16 +310,16 @@ export function PlaceForm({
               placeholder="info@misto.cz"
             />
           </Field>
-          <Field label="Web">
+          <Field label="Web" hint="Stačí www.misto.cz — https:// se doplní">
             <input
-              type="url"
+              type="text"
               name="website"
               defaultValue={defaults.website ?? ""}
               className={inputClass}
-              placeholder="https://misto.cz"
+              placeholder="www.misto.cz"
             />
           </Field>
-          <Field label="Instagram">
+          <Field label="Instagram" hint="Handle nebo URL">
             <input
               type="text"
               name="instagram"
@@ -217,13 +328,13 @@ export function PlaceForm({
               placeholder="@misto_oficialni"
             />
           </Field>
-          <Field label="Facebook">
+          <Field label="Facebook" hint="Stránka nebo URL">
             <input
               type="text"
               name="facebook"
               defaultValue={defaults.facebook ?? ""}
               className={inputClass}
-              placeholder="misto-oficialni nebo URL"
+              placeholder="misto-oficialni"
             />
           </Field>
         </div>
@@ -296,7 +407,11 @@ function Section({
   return (
     <section className="rounded-card-lg border border-line bg-white p-6 shadow-soft">
       <h2 className="text-base font-bold text-ink">{title}</h2>
-      {hint ? <p className="mb-4 mt-1 text-sm text-ink-muted">{hint}</p> : <div className="mb-4" />}
+      {hint ? (
+        <p className="mb-4 mt-1 text-sm text-ink-muted">{hint}</p>
+      ) : (
+        <div className="mb-4" />
+      )}
       <div className="space-y-4">{children}</div>
     </section>
   );
@@ -322,6 +437,34 @@ function Field({
       {children}
       {hint ? <p className="mt-1 text-xs text-ink-light">{hint}</p> : null}
     </div>
+  );
+}
+
+function ChipGroup({ children }: { children: React.ReactNode }) {
+  return <div className="flex flex-wrap gap-2">{children}</div>;
+}
+
+function Chip({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={
+        active
+          ? "inline-flex items-center rounded-full bg-gradient-to-r from-peach-strong to-rose-strong px-4 py-2 text-sm font-semibold text-white shadow-soft transition hover:-translate-y-0.5"
+          : "inline-flex items-center rounded-full border border-line-hover bg-white px-4 py-2 text-sm font-medium text-ink-muted transition hover:bg-surface hover:text-ink"
+      }
+    >
+      {children}
+    </button>
   );
 }
 
