@@ -2,7 +2,6 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { requireEditor } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import {
@@ -131,9 +130,20 @@ async function uploadPhotos(
 }
 
 /** Wrap an action body so that any thrown error becomes a friendly state.
- *  Re-throws Next.js redirect signals so navigation still works. */
+ *  Re-throws Next.js redirect/notFound signals so navigation still works. */
 function asActionError(label: string, e: unknown): PlaceFormState {
-  if (isRedirectError(e)) throw e;
+  // Next.js internal control-flow errors carry a `digest` starting with
+  // NEXT_REDIRECT, NEXT_NOT_FOUND or NEXT_HTTP_ERROR_FALLBACK. Re-throw so
+  // the framework can handle them.
+  if (
+    e &&
+    typeof e === "object" &&
+    "digest" in e &&
+    typeof (e as { digest: unknown }).digest === "string" &&
+    (e as { digest: string }).digest.startsWith("NEXT_")
+  ) {
+    throw e;
+  }
   console.error(`[${label}]`, e);
   const message = e instanceof Error ? e.message : "Neznámá chyba.";
   return { error: `${label}: ${message}` };
