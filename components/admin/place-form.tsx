@@ -189,7 +189,7 @@ export function PlaceForm({
             value={primaryCategoryId ?? ""}
           />
           <ChipGroup>
-            {categories.map((c, i) => {
+            {categories.map((c) => {
               const active = selectedCategories.includes(c.slug);
               const isPrimary = active && selectedCategories[0] === c.slug;
               return (
