@@ -30,6 +30,51 @@ export default function RootLayout({
 }) {
   return (
     <html lang="cs" className={inter.variable}>
+      <head>
+        {/* Tiny client-side error reporter — pipes uncaught browser errors
+            to /api/client-error so we can see them in Vercel logs. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function(){
+                function send(payload){
+                  try {
+                    fetch('/api/client-error', {
+                      method:'POST',
+                      headers:{'content-type':'application/json'},
+                      body: JSON.stringify(payload),
+                      keepalive: true,
+                    });
+                  } catch(_){}
+                }
+                window.addEventListener('error', function(e){
+                  send({
+                    kind:'error',
+                    message: e.message,
+                    filename: e.filename,
+                    lineno: e.lineno,
+                    colno: e.colno,
+                    stack: e.error && e.error.stack,
+                    url: location.href,
+                    ua: navigator.userAgent,
+                  });
+                });
+                window.addEventListener('unhandledrejection', function(e){
+                  var r = e.reason || {};
+                  send({
+                    kind:'unhandledrejection',
+                    message: r.message || String(r),
+                    stack: r.stack,
+                    name: r.name,
+                    url: location.href,
+                    ua: navigator.userAgent,
+                  });
+                });
+              })();
+            `,
+          }}
+        />
+      </head>
       <body className="min-h-screen bg-white font-sans text-ink antialiased">
         {children}
       </body>
