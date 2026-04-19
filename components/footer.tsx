@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { CATEGORIES } from "@/lib/places";
+import type { CategoryMeta } from "@/lib/places";
 
-export function Footer() {
+export function Footer({ categories }: { categories: CategoryMeta[] }) {
   return (
     <footer className="mt-20 border-t border-line bg-surface py-16">
       <div className="container-page">
@@ -21,7 +21,7 @@ export function Footer() {
               Objevuj
             </h5>
             <ul className="space-y-1">
-              {CATEGORIES.map((cat) => (
+              {categories.map((cat) => (
                 <li key={cat.slug}>
                   <Link
                     href={{ pathname: `/${cat.slug}` }}

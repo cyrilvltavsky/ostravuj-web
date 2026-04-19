@@ -3,17 +3,25 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { FilterChips } from "@/components/filter-chips";
 import {
-  CATEGORIES,
-  getCategory,
-  isCategorySlug,
-  placesInCategory,
-  subcategoriesInCategory,
-} from "@/lib/places";
+  getAllCategories,
+  getPlacesByCategory,
+  getSubcategoriesInCategory,
+} from "@/lib/queries/places";
+import type { CategorySlug, SubcategorySlug } from "@/lib/places";
 
 type Params = { category: string };
 
-export function generateStaticParams(): Params[] {
-  return CATEGORIES.map((c) => ({ category: c.slug }));
+const KNOWN_SLUGS: CategorySlug[] = ["gastro", "aktivity", "rande", "zdarma"];
+
+function isCategorySlug(s: string): s is CategorySlug {
+  return (KNOWN_SLUGS as string[]).includes(s);
+}
+
+export const revalidate = 60;
+
+export async function generateStaticParams(): Promise<Params[]> {
+  const cats = await getAllCategories();
+  return cats.map((c) => ({ category: c.slug }));
 }
 
 export async function generateMetadata({
@@ -22,7 +30,8 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { category } = await params;
-  const meta = getCategory(category);
+  const cats = await getAllCategories();
+  const meta = cats.find((c) => c.slug === category);
   if (!meta) return { title: "Ostravuj" };
   return {
     title: `${meta.title} — Ostravuj`,
@@ -38,9 +47,13 @@ export default async function CategoryPage({
   const { category } = await params;
   if (!isCategorySlug(category)) notFound();
 
-  const meta = getCategory(category)!;
-  const places = placesInCategory(category);
-  const subs = subcategoriesInCategory(category);
+  const [cats, places, subs] = await Promise.all([
+    getAllCategories(),
+    getPlacesByCategory(category),
+    getSubcategoriesInCategory(category),
+  ]);
+  const meta = cats.find((c) => c.slug === category);
+  if (!meta) notFound();
 
   return (
     <>
@@ -69,7 +82,10 @@ export default async function CategoryPage({
 
       <section className="pb-20">
         <div className="container-page">
-          <FilterChips places={places} subcategories={subs} />
+          <FilterChips
+            places={places}
+            subcategories={subs as SubcategorySlug[]}
+          />
         </div>
       </section>
     </>

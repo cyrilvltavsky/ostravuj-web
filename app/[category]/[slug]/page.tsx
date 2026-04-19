@@ -3,18 +3,20 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { DiscountCode } from "@/components/discount-code";
+import { hasVisibleContacts, mapyComUrl } from "@/lib/places";
 import {
-  PLACES,
-  getCategory,
-  getPlace,
-  hasVisibleContacts,
-  mapyComUrl,
-} from "@/lib/places";
+  getAllCategories,
+  getAllPlaceParams,
+  getPlaceBySlug,
+  getPlacePhotos,
+} from "@/lib/queries/places";
 
 type Params = { category: string; slug: string };
 
-export function generateStaticParams(): Params[] {
-  return PLACES.map((p) => ({ category: p.category, slug: p.slug }));
+export const revalidate = 60;
+
+export async function generateStaticParams(): Promise<Params[]> {
+  return getAllPlaceParams();
 }
 
 export async function generateMetadata({
@@ -23,7 +25,7 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const place = getPlace(slug);
+  const place = await getPlaceBySlug(slug);
   if (!place) return { title: "Ostravuj" };
   return {
     title: `${place.name} — Ostravuj`,
@@ -42,13 +44,24 @@ export default async function PlaceDetailPage({
   params: Promise<Params>;
 }) {
   const { category, slug } = await params;
-  const place = getPlace(slug);
+  const [place, cats, allPhotos] = await Promise.all([
+    getPlaceBySlug(slug),
+    getAllCategories(),
+    getPlacePhotos(slug),
+  ]);
   if (!place || place.category !== category) notFound();
 
-  const meta = getCategory(place.category)!;
+  const meta = cats.find((c) => c.slug === place.category);
+  if (!meta) notFound();
+
   const mapsUrl = mapyComUrl(place.address);
   const showContacts = hasVisibleContacts(place);
   const c = place.contacts;
+  // Gallery: pad with main photo up to 5 placeholders for the layout
+  const galleryPhotos = [
+    ...allPhotos,
+    ...Array(Math.max(0, 5 - allPhotos.length)).fill(place.image),
+  ].slice(0, 5);
 
   return (
     <>
@@ -84,7 +97,7 @@ export default async function PlaceDetailPage({
         <div className="mb-12 grid aspect-[16/9] grid-cols-1 grid-rows-1 gap-3 overflow-hidden rounded-card-lg md:aspect-[16/9] md:grid-cols-[2fr_1fr_1fr] md:grid-rows-2">
           <div className="relative bg-surface md:row-span-2">
             <Image
-              src={place.image}
+              src={galleryPhotos[0]}
               alt={place.name}
               fill
               sizes="(max-width: 768px) 100vw, 50vw"
@@ -92,10 +105,13 @@ export default async function PlaceDetailPage({
               priority
             />
           </div>
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="relative hidden bg-surface md:block">
+          {galleryPhotos.slice(1, 5).map((url, i) => (
+            <div
+              key={`${url}-${i}`}
+              className="relative hidden bg-surface md:block"
+            >
               <Image
-                src={place.image}
+                src={url}
                 alt=""
                 fill
                 sizes="25vw"

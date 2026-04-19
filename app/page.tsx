@@ -4,16 +4,21 @@ import { CategoryCard } from "@/components/category-card";
 import { PlaceCard } from "@/components/place-card";
 import { BigRandomButton, HeroRandomButton } from "@/components/random-picker";
 import {
-  CATEGORIES,
-  PLACES,
-  categoryCounts,
-  featuredPlaces,
-} from "@/lib/places";
+  getAllCategories,
+  getCategoryCounts,
+  getFeaturedPlaces,
+  getTotalPlaceCount,
+} from "@/lib/queries/places";
 
-export default function HomePage() {
-  const counts = categoryCounts();
-  const featured = featuredPlaces();
-  const total = PLACES.length;
+export const revalidate = 60;
+
+export default async function HomePage() {
+  const [categories, counts, featured, total] = await Promise.all([
+    getAllCategories(),
+    getCategoryCounts(),
+    getFeaturedPlaces(),
+    getTotalPlaceCount(),
+  ]);
 
   return (
     <>
@@ -63,7 +68,7 @@ export default function HomePage() {
       <section className="py-10 pb-20">
         <div className="container-page">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {CATEGORIES.map((cat, i) => (
+            {categories.map((cat, i) => (
               <AnimateOnScroll key={cat.slug} delay={i * 80}>
                 <CategoryCard category={cat} count={counts[cat.slug]} />
               </AnimateOnScroll>

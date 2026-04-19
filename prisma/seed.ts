@@ -6,7 +6,7 @@
  *   pnpm db:seed
  */
 import { PrismaClient } from "@prisma/client";
-import { CATEGORIES, FEATURED_SLUGS, PLACES } from "../lib/places";
+import { CATEGORIES, FEATURED_SLUGS, PLACES } from "./seed-data";
 
 const prisma = new PrismaClient();
 

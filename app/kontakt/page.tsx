@@ -2,22 +2,35 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { PlaceCard } from "@/components/place-card";
-import { CATEGORIES, placesInCategory } from "@/lib/places";
+import {
+  getAllCategories,
+  getPlacesByCategory,
+} from "@/lib/queries/places";
+import type { Place } from "@/lib/places";
 
 export const metadata: Metadata = {
   title: "Kontakt — Ostravuj",
   description: "Kontaktní údaje projektu Ostravuj.",
 };
 
-function pickRandomFromCategory() {
-  return CATEGORIES.map((cat) => {
-    const places = placesInCategory(cat.slug);
-    return places[Math.floor(Math.random() * places.length)];
-  });
+export const revalidate = 60;
+
+async function pickRandomFromCategory(): Promise<Place[]> {
+  const cats = await getAllCategories();
+  const lists = await Promise.all(
+    cats.map((cat) => getPlacesByCategory(cat.slug)),
+  );
+  return lists
+    .map((places) =>
+      places.length === 0
+        ? null
+        : places[Math.floor(Math.random() * places.length)],
+    )
+    .filter((p): p is Place => Boolean(p));
 }
 
-export default function ContactPage() {
-  const randomPlaces = pickRandomFromCategory();
+export default async function ContactPage() {
+  const randomPlaces = await pickRandomFromCategory();
 
   return (
     <>

@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { type Place, PLACES } from "@/lib/places";
+import type { Place } from "@/lib/places";
 
 type RandomPickerContextValue = {
   open: () => void;
@@ -19,32 +19,39 @@ function useRandomPicker() {
   return ctx;
 }
 
-function pickRandomPlace(except?: Place | null): Place {
-  if (PLACES.length === 1) return PLACES[0];
+function pickRandomPlace(places: Place[], except?: Place | null): Place {
+  if (places.length === 1) return places[0];
   let next: Place;
   do {
-    next = PLACES[Math.floor(Math.random() * PLACES.length)];
+    next = places[Math.floor(Math.random() * places.length)];
   } while (except && next.slug === except.slug);
   return next;
 }
 
-export function RandomPickerProvider({ children }: { children: React.ReactNode }) {
+export function RandomPickerProvider({
+  places,
+  children,
+}: {
+  places: Place[];
+  children: React.ReactNode;
+}) {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [picked, setPicked] = useState<Place | null>(null);
 
   const open = useCallback(() => {
-    setPicked(pickRandomPlace());
+    if (places.length === 0) return;
+    setPicked(pickRandomPlace(places));
     setIsOpen(true);
-  }, []);
+  }, [places]);
 
   const close = useCallback(() => {
     setIsOpen(false);
   }, []);
 
   const reroll = useCallback(() => {
-    setPicked((prev) => pickRandomPlace(prev));
-  }, []);
+    setPicked((prev) => pickRandomPlace(places, prev));
+  }, [places]);
 
   const goToPicked = useCallback(() => {
     if (!picked) return;
