@@ -1,11 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { Header } from "@/components/header";
-import { Footer } from "@/components/footer";
-import { CookieBanner } from "@/components/cookie-banner";
-import { RandomPickerProvider } from "@/components/random-picker";
-import { getAllCategories, getAllPlaces } from "@/lib/queries/places";
 
 const inter = Inter({
   subsets: ["latin", "latin-ext"],
@@ -28,25 +23,15 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [categories, places] = await Promise.all([
-    getAllCategories(),
-    getAllPlaces(),
-  ]);
-
   return (
     <html lang="cs" className={inter.variable}>
       <body className="min-h-screen bg-white font-sans text-ink antialiased">
-        <RandomPickerProvider places={places}>
-          <Header categories={categories} />
-          <main>{children}</main>
-          <Footer categories={categories} />
-          <CookieBanner />
-        </RandomPickerProvider>
+        {children}
       </body>
     </html>
   );
