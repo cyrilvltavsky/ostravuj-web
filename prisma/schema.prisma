@@ -28,12 +28,13 @@ model Profile {
   name      String?
   role      Role     @default(EDITOR)
   createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt      @map("updated_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
-  createdPlaces  Place[]    @relation("PlaceCreatedBy")
-  authoredDrafts Draft[]    @relation("DraftCreatedBy")
-  reviewedDrafts Draft[]    @relation("DraftReviewedBy")
-  auditLogs      AuditLog[]
+  createdPlaces       Place[]      @relation("PlaceCreatedBy")
+  authoredDrafts      Draft[]      @relation("DraftCreatedBy")
+  reviewedDrafts      Draft[]      @relation("DraftReviewedBy")
+  reviewedSuggestions Suggestion[] @relation("SuggestionReviewer")
+  auditLogs           AuditLog[]
 
   @@map("profiles")
 }
@@ -48,6 +49,10 @@ model Category {
   name        String
   emoji       String?
   description String?
+  subtitle    String?
+  eyebrow     String?
+  iconBg      String?  @map("icon_bg")
+  imageUrl    String?  @map("image_url")
   sortOrder   Int      @default(0) @map("sort_order")
   createdAt   DateTime @default(now()) @map("created_at")
 
@@ -70,24 +75,44 @@ model Place {
   slug        String      @unique
   name        String
   address     String
+  district    String?
+  subcategory String?
   mapsUrl     String?     @map("maps_url")
+  shortDesc   String      @map("short_desc") @db.Text
   description String      @db.Text
   categoryId  Int         @map("category_id")
   status      PlaceStatus @default(PUBLISHED)
+
+  // Tags as a flat string array (Postgres text[]).
+  tags String[] @default([])
+
+  // Optional contacts shown if showContacts = true and at least one is set.
+  phone     String?
+  email     String?
+  website   String?
+  instagram String?
+  facebook  String?
+
+  // Per-place admin toggles
+  showContacts Boolean @default(true) @map("show_contacts")
+  showDiscount Boolean @default(true) @map("show_discount")
+  featured     Boolean @default(false)
 
   createdById String?  @map("created_by") @db.Uuid
   createdBy   Profile? @relation("PlaceCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
 
   createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt      @map("updated_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
-  category     Category      @relation(fields: [categoryId], references: [id])
-  photos       PlacePhoto[]
-  discountCode DiscountCode?
-  drafts       Draft[]
+  category          Category      @relation(fields: [categoryId], references: [id])
+  photos            PlacePhoto[]
+  discountCode      DiscountCode?
+  drafts            Draft[]
+  suggestionResults Suggestion[]
 
   @@index([categoryId])
   @@index([status])
+  @@index([featured])
   @@map("places")
 }
 
@@ -146,7 +171,7 @@ model Draft {
 
   reviewNote String?   @map("review_note") @db.Text
   createdAt  DateTime  @default(now()) @map("created_at")
-  updatedAt  DateTime  @updatedAt       @map("updated_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
   reviewedAt DateTime? @map("reviewed_at")
 
   place Place? @relation(fields: [placeId], references: [id], onDelete: SetNull)
@@ -159,6 +184,40 @@ model Draft {
 // ─────────────────────────────────────────────
 // AUDIT LOG
 // ─────────────────────────────────────────────
+
+// ─────────────────────────────────────────────
+// SUGGESTIONS — typy od uživatelů z public formuláře
+// ─────────────────────────────────────────────
+
+enum SuggestionStatus {
+  NEW
+  APPROVED
+  REJECTED
+}
+
+model Suggestion {
+  id            String           @id @default(uuid()) @db.Uuid
+  placeName     String           @map("place_name")
+  category      String // raw slug (gastro/aktivity/rande/zdarma)
+  description   String           @db.Text
+  photoUrl      String?          @map("photo_url")
+  contactName   String           @map("contact_name")
+  contactEmail  String           @map("contact_email")
+  status        SuggestionStatus @default(NEW)
+  resultPlaceId String?          @map("result_place_id") @db.Uuid
+  reviewNote    String?          @map("review_note") @db.Text
+  reviewedById  String?          @map("reviewed_by") @db.Uuid
+  reviewedAt    DateTime?        @map("reviewed_at")
+  createdAt     DateTime         @default(now()) @map("created_at")
+  updatedAt     DateTime         @updatedAt @map("updated_at")
+
+  reviewedBy  Profile? @relation("SuggestionReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+  resultPlace Place?   @relation(fields: [resultPlaceId], references: [id], onDelete: SetNull)
+
+  @@index([status])
+  @@index([createdAt])
+  @@map("suggestions")
+}
 
 model AuditLog {
   id         String   @id @default(uuid()) @db.Uuid
