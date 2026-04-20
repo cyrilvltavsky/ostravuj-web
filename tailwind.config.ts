@@ -1,6 +1,7 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
+  darkMode: "class",
   content: [
     "./app/**/*.{ts,tsx}",
     "./components/**/*.{ts,tsx}",
@@ -12,16 +13,20 @@ const config: Config = {
         sans: ["var(--font-inter)", "system-ui", "sans-serif"],
       },
       colors: {
+        // Theme-aware via CSS variables (see globals.css). The fallback
+        // hex matches the original light palette so prerendered HTML
+        // looks the same when CSS hasn't loaded yet.
         ink: {
-          DEFAULT: "#111827",
-          muted: "#6b7280",
-          light: "#9ca3af",
+          DEFAULT: "rgb(var(--color-ink) / <alpha-value>)",
+          muted: "rgb(var(--color-ink-muted) / <alpha-value>)",
+          light: "rgb(var(--color-ink-light) / <alpha-value>)",
         },
         line: {
-          DEFAULT: "#f1f2f4",
-          hover: "#e5e7eb",
+          DEFAULT: "rgb(var(--color-line) / <alpha-value>)",
+          hover: "rgb(var(--color-line-hover) / <alpha-value>)",
         },
-        surface: "#fafafa",
+        surface: "rgb(var(--color-surface) / <alpha-value>)",
+        white: "rgb(var(--color-white) / <alpha-value>)",
         peach: {
           DEFAULT: "#ffe4d6",
           strong: "#f97316",

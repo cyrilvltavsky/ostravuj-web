@@ -29,8 +29,23 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="cs" className={inter.variable}>
+    <html lang="cs" className={inter.variable} suppressHydrationWarning>
       <head>
+        {/* Apply persisted theme BEFORE first paint to avoid flash. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function(){
+                try {
+                  var t = localStorage.getItem('ostravuj-theme');
+                  if (t === 'dark' || (!t && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                    document.documentElement.classList.add('dark');
+                  }
+                } catch(_) {}
+              })();
+            `,
+          }}
+        />
         {/* Tiny client-side error reporter — pipes uncaught browser errors
             to /api/client-error so we can see them in Vercel logs. */}
         <script

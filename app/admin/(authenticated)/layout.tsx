@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { requireEditor } from "@/lib/auth";
 import { AdminSidebar } from "@/components/admin/sidebar";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export const dynamic = "force-dynamic";
 
@@ -30,6 +31,7 @@ export default async function AdminLayout({
             >
               ← Zpět na web
             </Link>
+            <ThemeToggle />
             <form action="/admin/logout" method="post">
               <button
                 type="submit"

@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { CategoryMeta } from "@/lib/places";
 import { RandomButton } from "./random-picker";
+import { ThemeToggle } from "./theme-toggle";
 
 export function Header({ categories }: { categories: CategoryMeta[] }) {
   const pathname = usePathname();
@@ -65,6 +66,7 @@ export function Header({ categories }: { categories: CategoryMeta[] }) {
 
         <div className="flex items-center gap-2">
           <RandomButton />
+          <ThemeToggle />
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}

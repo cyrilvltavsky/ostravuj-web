@@ -3,16 +3,46 @@
 @tailwind utilities;
 
 @layer base {
+  /* Light theme (default) */
+  :root {
+    --color-white: 255 255 255;
+    --color-surface: 250 250 250;
+    --color-line: 241 242 244;
+    --color-line-hover: 229 231 235;
+    --color-ink: 17 24 39;
+    --color-ink-muted: 107 114 128;
+    --color-ink-light: 156 163 175;
+  }
+
+  /* Dark theme — applied when <html class="dark"> */
+  .dark {
+    --color-white: 24 24 27;
+    --color-surface: 17 17 19;
+    --color-line: 39 39 42;
+    --color-line-hover: 63 63 70;
+    --color-ink: 244 244 245;
+    --color-ink-muted: 161 161 170;
+    --color-ink-light: 113 113 122;
+  }
+
   html {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     scroll-behavior: smooth;
+    background: rgb(var(--color-surface));
+    color: rgb(var(--color-ink));
+    color-scheme: light;
+  }
+  .dark html,
+  html.dark {
+    color-scheme: dark;
   }
 
   body {
     text-rendering: optimizeLegibility;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     line-height: 1.6;
+    transition: background-color 200ms ease, color 200ms ease;
   }
 }
 

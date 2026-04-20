@@ -12,7 +12,8 @@
     "db:deploy": "dotenv -e .env.local -- prisma migrate deploy",
     "db:studio": "dotenv -e .env.local -- prisma studio",
     "db:push": "dotenv -e .env.local -- prisma db push",
-    "db:seed": "dotenv -e .env.local -- tsx prisma/seed.ts"
+    "db:seed": "dotenv -e .env.local -- tsx prisma/seed.ts",
+    "db:seed-curated": "dotenv -e .env.local -- tsx prisma/seed-curated.ts"
   },
   "prisma": {
     "seed": "dotenv -e .env.local -- tsx prisma/seed.ts"
