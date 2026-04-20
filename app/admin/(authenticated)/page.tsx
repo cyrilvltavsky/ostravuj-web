@@ -62,7 +62,7 @@ export default async function AdminDashboardPage() {
           </Link>
           <Link
             href="/admin/places"
-            className="inline-flex items-center gap-2 rounded-[14px] border border-line-hover bg-white px-5 py-2.5 text-sm font-medium text-ink-muted transition hover:bg-surface hover:text-ink"
+            className="inline-flex items-center gap-2 rounded-[14px] border border-line-hover bg-card px-5 py-2.5 text-sm font-medium text-ink-muted transition hover:bg-surface hover:text-ink"
           >
             Spravovat místa →
           </Link>
@@ -174,7 +174,7 @@ function StatCard({
   return (
     <Link
       href={href as `/admin${string}`}
-      className={`group rounded-card-lg border bg-white p-5 shadow-soft transition-all hover:-translate-y-0.5 hover:shadow-soft-md ${highlight ? "border-peach-strong/40" : "border-line"}`}
+      className={`group rounded-card-lg border bg-card p-5 shadow-soft transition-all hover:-translate-y-0.5 hover:shadow-soft-md ${highlight ? "border-peach-strong/40" : "border-line"}`}
     >
       <span
         className={`inline-block rounded-full px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider ${t.bg} ${t.text}`}
@@ -202,7 +202,7 @@ function Panel({
   footerLabel: string;
 }) {
   return (
-    <section className="rounded-card-lg border border-line bg-white p-6 shadow-soft">
+    <section className="rounded-card-lg border border-line bg-card p-6 shadow-soft">
       <h2 className="mb-4 text-base font-bold text-ink">{title}</h2>
       {items.length === 0 ? (
         <p className="text-sm text-ink-muted">{empty}</p>

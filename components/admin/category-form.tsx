@@ -7,7 +7,7 @@ import type { CategoryFormState } from "@/app/admin/(authenticated)/categories/a
 const initial: CategoryFormState = { error: null };
 
 const inputClass =
-  "w-full rounded-xl border border-line bg-white px-4 py-2.5 text-[15px] text-ink shadow-soft outline-none transition-all placeholder:text-ink-light focus:border-peach-strong focus:ring-1 focus:ring-peach-strong/30";
+  "w-full rounded-xl border border-line bg-card px-4 py-2.5 text-[15px] text-ink shadow-soft outline-none transition-all placeholder:text-ink-light focus:border-peach-strong focus:ring-1 focus:ring-peach-strong/30";
 const labelClass = "mb-1.5 block text-sm font-semibold text-ink";
 
 function slugifyClient(s: string): string {

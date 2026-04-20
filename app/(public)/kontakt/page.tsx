@@ -48,7 +48,7 @@ export default async function ContactPage() {
           </h1>
 
           {/* CONTACT CARD */}
-          <div className="relative overflow-hidden rounded-card-xl border border-line bg-white shadow-soft-md">
+          <div className="relative overflow-hidden rounded-card-xl border border-line bg-card shadow-soft-md">
             <div
               aria-hidden
               className="pointer-events-none absolute -right-20 -top-20 h-[200px] w-[200px] rounded-full opacity-30"
@@ -154,7 +154,7 @@ export default async function ContactPage() {
           <div className="mt-8 text-center">
             <Link
               href="/gastro"
-              className="inline-flex items-center gap-2.5 rounded-[14px] border border-line-hover bg-white px-6 py-3.5 text-[15px] font-semibold text-ink transition hover:-translate-y-0.5 hover:bg-surface"
+              className="inline-flex items-center gap-2.5 rounded-[14px] border border-line-hover bg-card px-6 py-3.5 text-[15px] font-semibold text-ink transition hover:-translate-y-0.5 hover:bg-surface"
             >
               Prohlédnout všechna místa →
             </Link>

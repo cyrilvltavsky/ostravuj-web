@@ -90,7 +90,7 @@ export default async function RecommendPage({
         {hasInput ? (
           <div className="mt-12">
             {scored.length === 0 ? (
-              <div className="rounded-card-lg border border-line bg-white p-10 text-center text-ink-muted shadow-soft">
+              <div className="rounded-card-lg border border-line bg-card p-10 text-center text-ink-muted shadow-soft">
                 <p className="font-semibold text-ink">
                   Nic přesně nesedí na tvé hledání.
                 </p>
@@ -124,7 +124,7 @@ export default async function RecommendPage({
             )}
           </div>
         ) : (
-          <p className="mt-12 rounded-card-lg border border-line bg-white p-8 text-center text-sm text-ink-muted shadow-soft">
+          <p className="mt-12 rounded-card-lg border border-line bg-card p-8 text-center text-sm text-ink-muted shadow-soft">
             Zadej dotaz nebo vyber kategorii pro doporučení. Nebo si nech
             <Link
               href="/"

@@ -12,7 +12,7 @@ export function PlaceCard({ place }: PlaceCardProps) {
   return (
     <Link
       href={{ pathname: `/${place.category}/${place.slug}` }}
-      className="group flex flex-col overflow-hidden rounded-card-lg border border-line bg-white text-left transition-all hover:-translate-y-1 hover:border-transparent hover:shadow-soft-lg"
+      className="group flex flex-col overflow-hidden rounded-card-lg border border-line bg-card text-left transition-all hover:-translate-y-1 hover:border-transparent hover:shadow-soft-lg"
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-surface">
         <Image

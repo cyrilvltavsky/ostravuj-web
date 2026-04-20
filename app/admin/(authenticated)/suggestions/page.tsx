@@ -31,11 +31,11 @@ export default async function AdminSuggestionsPage() {
       </p>
 
       {suggestions.length === 0 ? (
-        <div className="rounded-card-lg border border-line bg-white p-10 text-center text-ink-muted shadow-soft">
+        <div className="rounded-card-lg border border-line bg-card p-10 text-center text-ink-muted shadow-soft">
           Zatím žádné návrhy.
         </div>
       ) : (
-        <div className="overflow-hidden rounded-card-lg border border-line bg-white shadow-soft">
+        <div className="overflow-hidden rounded-card-lg border border-line bg-card shadow-soft">
           <table className="w-full text-left text-sm">
             <thead className="bg-surface text-xs font-bold uppercase tracking-wider text-ink-muted">
               <tr>

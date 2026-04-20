@@ -63,7 +63,7 @@ export default async function HomePage() {
             </HeroRandomButton>
             <Link
               href="/doporuc"
-              className="inline-flex items-center gap-2.5 rounded-[14px] border border-line-hover bg-white px-6 py-3.5 text-[15px] font-semibold text-ink transition hover:-translate-y-0.5 hover:bg-surface"
+              className="inline-flex items-center gap-2.5 rounded-[14px] border border-line-hover bg-card px-6 py-3.5 text-[15px] font-semibold text-ink transition hover:-translate-y-0.5 hover:bg-surface"
             >
               Doporuč mi místo →
             </Link>

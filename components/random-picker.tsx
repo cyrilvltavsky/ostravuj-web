@@ -94,7 +94,7 @@ export function RandomPickerProvider({
             if (e.target === e.currentTarget) close();
           }}
         >
-          <div className="relative w-full max-w-[480px] animate-slide-up rounded-card-xl bg-white p-10 text-center shadow-soft-lg">
+          <div className="relative w-full max-w-[480px] animate-slide-up rounded-card-xl bg-card p-10 text-center shadow-soft-lg">
             <button
               type="button"
               onClick={close}
@@ -123,7 +123,7 @@ export function RandomPickerProvider({
               <button
                 type="button"
                 onClick={reroll}
-                className="flex flex-1 items-center justify-center gap-2 rounded-[14px] border border-line-hover bg-white px-6 py-3.5 text-[15px] font-semibold text-ink transition hover:-translate-y-0.5 hover:bg-surface"
+                className="flex flex-1 items-center justify-center gap-2 rounded-[14px] border border-line-hover bg-card px-6 py-3.5 text-[15px] font-semibold text-ink transition hover:-translate-y-0.5 hover:bg-surface"
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="1"/><circle cx="15" cy="9" r="1"/><circle cx="9" cy="15" r="1"/><circle cx="15" cy="15" r="1"/></svg> Zkusit znovu
               </button>

@@ -19,50 +19,43 @@ export function CategoryCard({
   return (
     <Link
       href={{ pathname: `/${category.slug}` }}
-      className="group relative block overflow-hidden rounded-card-xl bg-ink shadow-soft transition-all hover:-translate-y-1 hover:shadow-soft-lg"
+      className="group flex items-stretch gap-5 overflow-hidden rounded-card-xl border border-line bg-card p-5 shadow-soft transition-all hover:-translate-y-1 hover:border-line-hover hover:shadow-soft-lg sm:p-6"
     >
-      {/* Photo with dark overlay */}
-      <div className="relative aspect-[4/3] overflow-hidden">
-        {category.image ? (
-          <Image
-            src={category.image}
-            alt={category.title}
-            fill
-            sizes="(max-width: 640px) 100vw, 50vw"
-            className="object-cover transition-transform duration-700 group-hover:scale-110"
-          />
-        ) : null}
-        {/* Gradient overlay for text legibility */}
-        <div
-          aria-hidden
-          className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-black/40"
-        />
-
-        {/* Centered title + count */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center text-white">
-          <h3 className="mb-3 text-[clamp(28px,4vw,42px)] font-extrabold leading-tight tracking-tight drop-shadow-lg">
+      {/* Left — text + chips */}
+      <div className="flex min-w-0 flex-1 flex-col justify-between">
+        <div>
+          <h3 className="text-[clamp(28px,4vw,40px)] font-extrabold leading-[1.05] tracking-tight text-ink">
             {category.title}
           </h3>
-          <p className="text-[clamp(40px,6vw,64px)] font-extrabold leading-none tracking-tight drop-shadow-lg">
-            {count}
-          </p>
-          <p className="mt-1 text-sm font-medium uppercase tracking-wider opacity-90">
-            {countLabel}
+          <p className="mt-1 text-base font-medium text-ink-muted">
+            {count} {countLabel}
           </p>
         </div>
 
-        {/* Subcategory chips at bottom */}
         {subcategories.length > 0 ? (
-          <div className="absolute inset-x-0 bottom-0 flex flex-wrap justify-center gap-1.5 px-4 pb-4">
-            {subcategories.map((sub) => (
+          <div className="mt-4 flex flex-wrap gap-1.5">
+            {subcategories.slice(0, 4).map((sub) => (
               <span
                 key={sub}
-                className="rounded-full bg-white/20 px-2.5 py-1 text-[11px] font-semibold text-white backdrop-blur-sm"
+                className="rounded-full bg-surface px-2.5 py-1 text-[11px] font-semibold text-ink-muted"
               >
                 {sub}
               </span>
             ))}
           </div>
+        ) : null}
+      </div>
+
+      {/* Right — photo */}
+      <div className="relative aspect-[4/3] w-[40%] shrink-0 overflow-hidden rounded-card bg-surface">
+        {category.image ? (
+          <Image
+            src={category.image}
+            alt={category.title}
+            fill
+            sizes="(max-width: 640px) 40vw, 240px"
+            className="object-cover transition-transform duration-700 group-hover:scale-110"
+          />
         ) : null}
       </div>
     </Link>

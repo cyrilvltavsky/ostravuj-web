@@ -17,7 +17,7 @@ export default function PublicError({
 
   return (
     <section className="container-page py-20">
-      <div className="mx-auto max-w-[640px] rounded-card-lg border border-line bg-white p-8 shadow-soft">
+      <div className="mx-auto max-w-[640px] rounded-card-lg border border-line bg-card p-8 shadow-soft">
         <h1 className="mb-2 text-2xl font-extrabold tracking-tight text-ink">
           Něco se pokazilo při načítání stránky
         </h1>
@@ -38,7 +38,7 @@ export default function PublicError({
             </p>
           ) : null}
           {error.stack ? (
-            <pre className="mt-3 max-h-60 overflow-auto whitespace-pre-wrap rounded-lg bg-white p-3 text-[11px] text-ink-muted">
+            <pre className="mt-3 max-h-60 overflow-auto whitespace-pre-wrap rounded-lg bg-card p-3 text-[11px] text-ink-muted">
               {error.stack}
             </pre>
           ) : null}

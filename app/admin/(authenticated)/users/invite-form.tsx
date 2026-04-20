@@ -6,7 +6,7 @@ import { inviteUser, type InviteState } from "./actions";
 const initial: InviteState = { error: null, success: null };
 
 const inputClass =
-  "w-full rounded-xl border border-line bg-white px-4 py-2.5 text-[15px] text-ink shadow-soft outline-none transition-all placeholder:text-ink-light focus:border-peach-strong focus:ring-1 focus:ring-peach-strong/30";
+  "w-full rounded-xl border border-line bg-card px-4 py-2.5 text-[15px] text-ink shadow-soft outline-none transition-all placeholder:text-ink-light focus:border-peach-strong focus:ring-1 focus:ring-peach-strong/30";
 
 export function InviteForm() {
   const [state, formAction, pending] = useActionState(inviteUser, initial);

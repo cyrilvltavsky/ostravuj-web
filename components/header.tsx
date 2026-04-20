@@ -32,7 +32,7 @@ export function Header({ categories }: { categories: CategoryMeta[] }) {
       : "rounded-xl px-4 py-2.5 text-sm font-medium text-ink-muted transition-colors hover:text-gradient hover:bg-surface";
 
   return (
-    <header className="sticky top-0 z-50 border-b border-line bg-white/85 backdrop-blur-xl backdrop-saturate-150">
+    <header className="sticky top-0 z-50 border-b border-line bg-card/85 backdrop-blur-xl backdrop-saturate-150">
       <div className="container-page flex h-[72px] items-center justify-between">
         <Link
           href="/"
@@ -80,7 +80,7 @@ export function Header({ categories }: { categories: CategoryMeta[] }) {
       </div>
 
       {open && (
-        <nav className="absolute left-0 right-0 top-[72px] z-40 flex flex-col gap-1 border-b border-line bg-white px-6 pb-6 pt-4 shadow-soft-lg md:hidden">
+        <nav className="absolute left-0 right-0 top-[72px] z-40 flex flex-col gap-1 border-b border-line bg-card px-6 pb-6 pt-4 shadow-soft-lg md:hidden">
           <Link
             href="/"
             className="rounded-xl px-4 py-3.5 text-base font-medium text-ink-muted hover:bg-surface hover:text-gradient"

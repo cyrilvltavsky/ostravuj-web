@@ -78,7 +78,7 @@ export function AdminSidebar({ role }: { role: Role }) {
     href === "/admin" ? pathname === "/admin" : pathname.startsWith(href);
 
   return (
-    <aside className="hidden w-[240px] shrink-0 flex-col border-r border-line bg-white md:flex">
+    <aside className="hidden w-[240px] shrink-0 flex-col border-r border-line bg-card md:flex">
       <Link
         href="/admin"
         className="text-gradient block border-b border-line px-6 py-5 text-2xl font-extrabold tracking-tight"

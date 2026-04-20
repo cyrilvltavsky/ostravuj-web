@@ -35,7 +35,7 @@ export default function SuggestPage() {
           . My místo prověříme a&nbsp;pokud bude sedět, rádi ho přidáme.
         </p>
 
-        <div className="rounded-card-lg border border-line bg-white p-8 md:p-10">
+        <div className="rounded-card-lg border border-line bg-card p-8 md:p-10">
           <SuggestForm />
         </div>
       </div>

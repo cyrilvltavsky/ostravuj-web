@@ -24,7 +24,7 @@ export default async function LoginPage({
           Ostravuj
         </Link>
 
-        <div className="rounded-card-xl border border-line bg-white p-8 shadow-soft-md">
+        <div className="rounded-card-xl border border-line bg-card p-8 shadow-soft-md">
           <h1 className="mb-2 text-2xl font-extrabold tracking-tight text-ink">
             Přihlášení do administrace
           </h1>

@@ -23,7 +23,7 @@ export function FilterChips({ places, subcategories }: FilterChipsProps) {
     `rounded-full px-4 py-2 text-sm font-medium transition-colors ${
       active
         ? "border border-ink bg-ink text-white"
-        : "border border-line-hover bg-white text-ink-muted hover:bg-surface hover:text-ink"
+        : "border border-line-hover bg-card text-ink-muted hover:bg-surface hover:text-ink"
     }`;
 
   return (

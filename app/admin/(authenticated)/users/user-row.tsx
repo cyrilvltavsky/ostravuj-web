@@ -61,7 +61,7 @@ export function UserRow({
             value={role}
             onChange={handleRoleChange}
             disabled={pending}
-            className="rounded-xl border border-line-hover bg-white px-3 py-1.5 text-sm font-medium text-ink"
+            className="rounded-xl border border-line-hover bg-card px-3 py-1.5 text-sm font-medium text-ink"
           >
             <option value="EDITOR">Editor</option>
             <option value="SUPERADMIN">Super admin</option>

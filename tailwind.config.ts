@@ -16,6 +16,9 @@ const config: Config = {
         // Theme-aware via CSS variables (see globals.css). The fallback
         // hex matches the original light palette so prerendered HTML
         // looks the same when CSS hasn't loaded yet.
+        // NOTE: We do NOT override `white` — `text-white` / `bg-white`
+        // must stay actual white (used on gradient buttons + overlays).
+        // Use `bg-card` for surfaces that should flip in dark mode.
         ink: {
           DEFAULT: "rgb(var(--color-ink) / <alpha-value>)",
           muted: "rgb(var(--color-ink-muted) / <alpha-value>)",
@@ -26,7 +29,7 @@ const config: Config = {
           hover: "rgb(var(--color-line-hover) / <alpha-value>)",
         },
         surface: "rgb(var(--color-surface) / <alpha-value>)",
-        white: "rgb(var(--color-white) / <alpha-value>)",
+        card: "rgb(var(--color-card) / <alpha-value>)",
         peach: {
           DEFAULT: "#ffe4d6",
           strong: "#f97316",

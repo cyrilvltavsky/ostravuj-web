@@ -17,7 +17,7 @@ export default async function AdminLayout({
       <AdminSidebar role={profile.role} />
 
       <div className="flex flex-1 flex-col">
-        <header className="flex items-center justify-between border-b border-line bg-white px-6 py-4">
+        <header className="flex items-center justify-between border-b border-line bg-card px-6 py-4">
           <div className="text-sm text-ink-muted">
             <span className="font-semibold text-ink">{profile.email}</span>{" "}
             <span className="rounded-full bg-surface px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider text-ink-muted">
@@ -35,7 +35,7 @@ export default async function AdminLayout({
             <form action="/admin/logout" method="post">
               <button
                 type="submit"
-                className="rounded-xl border border-line-hover bg-white px-3 py-1.5 text-sm font-medium text-ink-muted transition hover:bg-surface hover:text-ink"
+                className="rounded-xl border border-line-hover bg-card px-3 py-1.5 text-sm font-medium text-ink-muted transition hover:bg-surface hover:text-ink"
               >
                 Odhlásit
               </button>

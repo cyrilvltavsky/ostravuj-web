@@ -44,7 +44,7 @@ export function DiscountCode({ code }: DiscountCodeProps) {
         className={`flex w-full items-center justify-between rounded-xl border-2 px-5 py-4 text-lg font-bold tracking-wider transition ${
           copied
             ? "border-solid border-mint-strong bg-mint text-mint-deep"
-            : "border-dashed border-peach-strong bg-white text-peach-deep hover:-translate-y-0.5 hover:bg-[#fff7ed]"
+            : "border-dashed border-peach-strong bg-card text-peach-deep hover:-translate-y-0.5 hover:bg-[#fff7ed]"
         }`}
       >
         <span>{code}</span>

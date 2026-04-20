@@ -37,7 +37,7 @@ export type PlaceFormDefaults = {
 };
 
 const inputClass =
-  "w-full rounded-xl border border-line bg-white px-4 py-2.5 text-[15px] text-ink shadow-soft outline-none transition-all placeholder:text-ink-light focus:border-peach-strong focus:ring-1 focus:ring-peach-strong/30";
+  "w-full rounded-xl border border-line bg-card px-4 py-2.5 text-[15px] text-ink shadow-soft outline-none transition-all placeholder:text-ink-light focus:border-peach-strong focus:ring-1 focus:ring-peach-strong/30";
 
 const labelClass = "mb-1.5 block text-sm font-semibold text-ink";
 
@@ -397,7 +397,7 @@ export function PlaceForm({
         />
       </Section>
 
-      <div className="sticky bottom-0 -mx-6 -mb-12 border-t border-line bg-white/95 px-6 py-4 backdrop-blur md:-mx-10 md:px-10">
+      <div className="sticky bottom-0 -mx-6 -mb-12 border-t border-line bg-card/95 px-6 py-4 backdrop-blur md:-mx-10 md:px-10">
         <div className="flex flex-wrap items-center gap-3">
           <button
             type="submit"
@@ -411,7 +411,7 @@ export function PlaceForm({
             name="saveAsDraft"
             value="1"
             disabled={pending}
-            className="inline-flex items-center gap-2 rounded-[14px] border border-line-hover bg-white px-5 py-3 text-[15px] font-medium text-ink-muted transition hover:bg-surface hover:text-ink disabled:pointer-events-none disabled:opacity-60"
+            className="inline-flex items-center gap-2 rounded-[14px] border border-line-hover bg-card px-5 py-3 text-[15px] font-medium text-ink-muted transition hover:bg-surface hover:text-ink disabled:pointer-events-none disabled:opacity-60"
           >
             Uložit jako koncept
           </button>
@@ -434,7 +434,7 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-card-lg border border-line bg-white p-6 shadow-soft">
+    <section className="rounded-card-lg border border-line bg-card p-6 shadow-soft">
       <h2 className="text-base font-bold text-ink">{title}</h2>
       {hint ? (
         <p className="mb-4 mt-1 text-sm text-ink-muted">{hint}</p>
@@ -489,7 +489,7 @@ function Chip({
       className={
         active
           ? "inline-flex items-center rounded-full bg-gradient-to-r from-peach-strong to-rose-strong px-4 py-2 text-sm font-semibold text-white shadow-soft transition hover:-translate-y-0.5"
-          : "inline-flex items-center rounded-full border border-line-hover bg-white px-4 py-2 text-sm font-medium text-ink-muted transition hover:bg-surface hover:text-ink"
+          : "inline-flex items-center rounded-full border border-line-hover bg-card px-4 py-2 text-sm font-medium text-ink-muted transition hover:bg-surface hover:text-ink"
       }
     >
       {children}

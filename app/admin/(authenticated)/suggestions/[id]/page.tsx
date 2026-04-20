@@ -99,7 +99,7 @@ export default async function SuggestionDetailPage({
         </section>
 
         <aside className="space-y-4 md:sticky md:top-6 md:self-start">
-          <div className="rounded-card-lg border border-line bg-white p-5 shadow-soft">
+          <div className="rounded-card-lg border border-line bg-card p-5 shadow-soft">
             <p className="mb-3 text-xs font-bold uppercase tracking-wider text-ink-light">
               Status
             </p>
@@ -131,11 +131,11 @@ export default async function SuggestionDetailPage({
                     name="note"
                     rows={2}
                     placeholder="Důvod zamítnutí (volitelné)"
-                    className="w-full rounded-xl border border-line bg-white px-3 py-2 text-xs text-ink shadow-soft outline-none focus:border-rose-strong focus:ring-1 focus:ring-rose-strong/30"
+                    className="w-full rounded-xl border border-line bg-card px-3 py-2 text-xs text-ink shadow-soft outline-none focus:border-rose-strong focus:ring-1 focus:ring-rose-strong/30"
                   />
                   <button
                     type="submit"
-                    className="w-full rounded-xl border border-line-hover bg-white px-4 py-2 text-sm font-medium text-rose-strong transition hover:bg-rose/30"
+                    className="w-full rounded-xl border border-line-hover bg-card px-4 py-2 text-sm font-medium text-rose-strong transition hover:bg-rose/30"
                   >
                     Zamítnout
                   </button>
@@ -145,7 +145,7 @@ export default async function SuggestionDetailPage({
               <form action={reopen}>
                 <button
                   type="submit"
-                  className="w-full rounded-xl border border-line-hover bg-white px-4 py-2 text-sm font-medium text-ink-muted transition hover:bg-surface hover:text-ink"
+                  className="w-full rounded-xl border border-line-hover bg-card px-4 py-2 text-sm font-medium text-ink-muted transition hover:bg-surface hover:text-ink"
                 >
                   Vrátit jako nový
                 </button>
@@ -166,7 +166,7 @@ function Card({
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-card-lg border border-line bg-white p-5 shadow-soft">
+    <div className="rounded-card-lg border border-line bg-card p-5 shadow-soft">
       <p className="mb-2 text-xs font-bold uppercase tracking-wider text-ink-light">
         {title}
       </p>

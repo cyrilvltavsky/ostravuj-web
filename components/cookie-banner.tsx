@@ -26,7 +26,7 @@ export function CookieBanner() {
   if (!visible) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-[60] border-t border-line bg-white/95 backdrop-blur-lg">
+    <div className="fixed bottom-0 left-0 right-0 z-[60] border-t border-line bg-card/95 backdrop-blur-lg">
       <div className="container-page flex flex-col items-start gap-4 py-4 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-ink-muted">
           Tento web používá cookies pro správné fungování a analýzu

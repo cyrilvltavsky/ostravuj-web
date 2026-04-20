@@ -35,7 +35,7 @@ export default async function AdminCategoriesPage() {
         </Link>
       </div>
 
-      <div className="overflow-hidden rounded-card-lg border border-line bg-white shadow-soft">
+      <div className="overflow-hidden rounded-card-lg border border-line bg-card shadow-soft">
         <table className="w-full text-left text-sm">
           <thead className="bg-surface text-xs font-bold uppercase tracking-wider text-ink-muted">
             <tr>

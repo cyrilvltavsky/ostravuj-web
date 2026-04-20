@@ -41,7 +41,7 @@ export function LoginForm({
           autoComplete="email"
           autoFocus
           placeholder="vas@email.cz"
-          className="w-full rounded-xl border border-line bg-surface/50 px-4 py-3 text-[15px] text-ink shadow-soft outline-none transition-all placeholder:text-ink-light focus:border-peach-strong focus:bg-white focus:ring-1 focus:ring-peach-strong/30"
+          className="w-full rounded-xl border border-line bg-surface/50 px-4 py-3 text-[15px] text-ink shadow-soft outline-none transition-all placeholder:text-ink-light focus:border-peach-strong focus:bg-card focus:ring-1 focus:ring-peach-strong/30"
         />
       </div>
 

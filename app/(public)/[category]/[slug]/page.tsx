@@ -138,7 +138,7 @@ export default async function PlaceDetailPage({
           </div>
 
           <aside className="space-y-4 self-start md:sticky md:top-[100px]">
-            <div className="rounded-card-lg border border-line bg-white p-7">
+            <div className="rounded-card-lg border border-line bg-card p-7">
               <h4 className="mb-3 text-[13px] font-bold uppercase tracking-wider text-ink-light">
                 Navigace
               </h4>
@@ -156,7 +156,7 @@ export default async function PlaceDetailPage({
             </div>
 
             {showContacts && c ? (
-              <div className="rounded-card-lg border border-line bg-white p-7">
+              <div className="rounded-card-lg border border-line bg-card p-7">
                 <h4 className="mb-4 text-[13px] font-bold uppercase tracking-wider text-ink-light">
                   Kontakty
                 </h4>

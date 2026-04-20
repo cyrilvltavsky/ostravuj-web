@@ -90,7 +90,7 @@ export function PlacesTable({ rows }: { rows: PlaceRow[] }) {
             <button
               type="button"
               onClick={() => setSelected(new Set())}
-              className="rounded-xl border border-line-hover bg-white px-3 py-1.5 text-xs font-medium text-ink-muted transition hover:bg-surface hover:text-ink"
+              className="rounded-xl border border-line-hover bg-card px-3 py-1.5 text-xs font-medium text-ink-muted transition hover:bg-surface hover:text-ink"
             >
               Zrušit výběr
             </button>
@@ -105,7 +105,7 @@ export function PlacesTable({ rows }: { rows: PlaceRow[] }) {
         </div>
       ) : null}
 
-      <div className="overflow-hidden rounded-card-lg border border-line bg-white shadow-soft">
+      <div className="overflow-hidden rounded-card-lg border border-line bg-card shadow-soft">
         <table className="w-full text-left text-sm">
           <thead className="bg-surface text-xs font-bold uppercase tracking-wider text-ink-muted">
             <tr>

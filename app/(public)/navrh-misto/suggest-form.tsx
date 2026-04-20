@@ -15,7 +15,7 @@ const CATEGORIES = [
 const initial: SuggestState = { success: false, error: null };
 
 const inputClass =
-  "w-full rounded-xl border border-line bg-surface/50 px-4 py-3 text-[15px] text-ink shadow-soft outline-none transition-all placeholder:text-ink-light focus:border-peach-strong focus:bg-white focus:shadow-soft-md focus:ring-1 focus:ring-peach-strong/30";
+  "w-full rounded-xl border border-line bg-surface/50 px-4 py-3 text-[15px] text-ink shadow-soft outline-none transition-all placeholder:text-ink-light focus:border-peach-strong focus:bg-card focus:shadow-soft-md focus:ring-1 focus:ring-peach-strong/30";
 
 export function SuggestForm() {
   const [state, formAction, pending] = useActionState(submitSuggestion, initial);

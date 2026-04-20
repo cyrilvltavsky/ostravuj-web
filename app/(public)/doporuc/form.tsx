@@ -64,7 +64,7 @@ export function RecommenderForm({
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="brunch, výhled, výběrová káva, romantika..."
-          className="w-full rounded-xl border border-line bg-white px-5 py-3.5 text-[17px] text-ink shadow-soft outline-none transition-all placeholder:text-ink-light focus:border-peach-strong focus:ring-1 focus:ring-peach-strong/30"
+          className="w-full rounded-xl border border-line bg-card px-5 py-3.5 text-[17px] text-ink shadow-soft outline-none transition-all placeholder:text-ink-light focus:border-peach-strong focus:ring-1 focus:ring-peach-strong/30"
         />
       </div>
 
@@ -128,7 +128,7 @@ export function RecommenderForm({
           <button
             type="button"
             onClick={handleReset}
-            className="inline-flex items-center gap-2 rounded-[14px] border border-line-hover bg-white px-5 py-3 text-[15px] font-medium text-ink-muted transition hover:bg-surface hover:text-ink"
+            className="inline-flex items-center gap-2 rounded-[14px] border border-line-hover bg-card px-5 py-3 text-[15px] font-medium text-ink-muted transition hover:bg-surface hover:text-ink"
           >
             Vyresetovat
           </button>
@@ -157,7 +157,7 @@ function Chip({
       className={
         active
           ? `inline-flex items-center rounded-full bg-gradient-to-r from-peach-strong to-rose-strong ${padding} font-semibold text-white shadow-soft transition hover:-translate-y-0.5`
-          : `inline-flex items-center rounded-full border border-line-hover bg-white ${padding} font-medium text-ink-muted transition hover:bg-surface hover:text-ink`
+          : `inline-flex items-center rounded-full border border-line-hover bg-card ${padding} font-medium text-ink-muted transition hover:bg-surface hover:text-ink`
       }
     >
       {children}

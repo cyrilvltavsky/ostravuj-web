@@ -53,7 +53,7 @@ export function ConfirmDialog({
         if (e.target === e.currentTarget && !pending) onCancel();
       }}
     >
-      <div className="w-full max-w-[440px] animate-slide-up rounded-card-xl bg-white p-7 shadow-soft-lg">
+      <div className="w-full max-w-[440px] animate-slide-up rounded-card-xl bg-card p-7 shadow-soft-lg">
         <h3
           id="confirm-title"
           className="mb-2 text-xl font-extrabold tracking-tight text-ink"
@@ -72,7 +72,7 @@ export function ConfirmDialog({
             type="button"
             onClick={onCancel}
             disabled={pending}
-            className="rounded-xl border border-line-hover bg-white px-5 py-2.5 text-sm font-medium text-ink-muted transition hover:bg-surface hover:text-ink disabled:opacity-60"
+            className="rounded-xl border border-line-hover bg-card px-5 py-2.5 text-sm font-medium text-ink-muted transition hover:bg-surface hover:text-ink disabled:opacity-60"
           >
             {cancelLabel}
           </button>

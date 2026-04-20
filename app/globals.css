@@ -5,7 +5,7 @@
 @layer base {
   /* Light theme (default) */
   :root {
-    --color-white: 255 255 255;
+    --color-card: 255 255 255;
     --color-surface: 250 250 250;
     --color-line: 241 242 244;
     --color-line-hover: 229 231 235;
@@ -16,7 +16,7 @@
 
   /* Dark theme — applied when <html class="dark"> */
   .dark {
-    --color-white: 24 24 27;
+    --color-card: 28 28 32;
     --color-surface: 17 17 19;
     --color-line: 39 39 42;
     --color-line-hover: 63 63 70;
