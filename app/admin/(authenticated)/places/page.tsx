@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { requireEditor } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { PlaceRowActions } from "./row-actions";
 
 export const dynamic = "force-dynamic";
 
@@ -84,6 +85,10 @@ export default async function AdminPlacesPage() {
                     <span className="rounded-full bg-mint/40 px-2.5 py-1 text-[11px] font-bold uppercase text-mint-deep">
                       Publikované
                     </span>
+                  ) : p.status === "DRAFT" ? (
+                    <span className="rounded-full bg-peach/40 px-2.5 py-1 text-[11px] font-bold uppercase text-peach-deep">
+                      Koncept
+                    </span>
                   ) : (
                     <span className="rounded-full bg-surface px-2.5 py-1 text-[11px] font-bold uppercase text-ink-light">
                       Archivované
@@ -101,12 +106,10 @@ export default async function AdminPlacesPage() {
                   )}
                 </td>
                 <td className="px-6 py-4 text-right">
-                  <Link
-                    href={`/admin/places/${p.id}/edit`}
-                    className="rounded-xl border border-line-hover px-3 py-1.5 text-xs font-medium text-ink-muted transition hover:bg-surface hover:text-ink"
-                  >
-                    Upravit
-                  </Link>
+                  <PlaceRowActions
+                    id={p.id}
+                    name={p.name}
+                  />
                 </td>
               </tr>
             ))}
