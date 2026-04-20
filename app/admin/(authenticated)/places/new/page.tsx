@@ -14,10 +14,16 @@ export default async function NewPlacePage({
   await requireEditor();
   const { fromSuggestion } = await searchParams;
 
-  const categories = await prisma.category.findMany({
-    orderBy: { sortOrder: "asc" },
-    select: { id: true, name: true, slug: true },
-  });
+  const [categories, subcategoryOptions] = await Promise.all([
+    prisma.category.findMany({
+      orderBy: { sortOrder: "asc" },
+      select: { id: true, name: true, slug: true },
+    }),
+    prisma.subcategory.findMany({
+      orderBy: [{ categoryId: "asc" }, { sortOrder: "asc" }],
+      select: { slug: true, name: true },
+    }),
+  ]);
 
   let defaults: PlaceFormDefaults = {};
   let fromTitle: string | null = null;
@@ -65,6 +71,7 @@ export default async function NewPlacePage({
       <PlaceForm
         action={createPlace}
         categories={categories}
+        subcategoryOptions={subcategoryOptions}
         defaults={defaults}
       />
     </>

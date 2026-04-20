@@ -3,22 +3,29 @@ import Link from "next/link";
 import { requireSuperAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { CategoryRow } from "./category-row";
+import { SubcategoryManager } from "./subcategory-manager";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminCategoriesPage() {
   await requireSuperAdmin();
 
-  const cats = await prisma.category.findMany({
-    orderBy: { sortOrder: "asc" },
-    include: { _count: { select: { places: true } } },
-  });
+  const [cats, subs] = await Promise.all([
+    prisma.category.findMany({
+      orderBy: { sortOrder: "asc" },
+      include: { _count: { select: { places: true } } },
+    }),
+    prisma.subcategory.findMany({
+      orderBy: [{ categoryId: "asc" }, { sortOrder: "asc" }],
+      select: { id: true, slug: true, name: true, categoryId: true },
+    }),
+  ]);
 
   return (
     <>
-      <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-ink">
+          <h1 className="text-2xl font-extrabold tracking-tight text-ink sm:text-3xl">
             Kategorie
           </h1>
           <p className="mt-1 text-sm text-ink-muted">
@@ -39,10 +46,10 @@ export default async function AdminCategoriesPage() {
         <table className="w-full text-left text-sm">
           <thead className="bg-surface text-xs font-bold uppercase tracking-wider text-ink-muted">
             <tr>
-              <th className="px-4 py-3 w-16">Pořadí</th>
-              <th className="px-4 py-3">Název / Slug</th>
-              <th className="px-4 py-3">Míst</th>
-              <th className="px-4 py-3 text-right">Akce</th>
+              <th className="px-3 py-3 w-12">#</th>
+              <th className="px-3 py-3">Název / Slug</th>
+              <th className="hidden px-3 py-3 sm:table-cell">Míst</th>
+              <th className="px-3 py-3 text-right">Akce</th>
             </tr>
           </thead>
           <tbody>
@@ -51,13 +58,13 @@ export default async function AdminCategoriesPage() {
                 key={c.id}
                 className="border-t border-line transition-colors hover:bg-surface/50"
               >
-                <td className="px-4 py-3 font-mono text-xs text-ink-light">
+                <td className="px-3 py-3 font-mono text-xs text-ink-light">
                   {c.sortOrder}
                 </td>
-                <td className="px-4 py-3">
+                <td className="px-3 py-3">
                   <div className="flex items-center gap-3">
                     {c.imageUrl ? (
-                      <div className="relative h-10 w-14 shrink-0 overflow-hidden rounded-md bg-surface">
+                      <div className="relative hidden h-10 w-14 shrink-0 overflow-hidden rounded-md bg-surface sm:block">
                         <Image
                           src={c.imageUrl}
                           alt=""
@@ -67,20 +74,23 @@ export default async function AdminCategoriesPage() {
                         />
                       </div>
                     ) : (
-                      <div className="h-10 w-14 shrink-0 rounded-md bg-surface" />
+                      <div className="hidden h-10 w-14 shrink-0 rounded-md bg-surface sm:block" />
                     )}
-                    <div>
-                      <p className="font-semibold text-ink">{c.name}</p>
-                      <p className="font-mono text-xs text-ink-light">
+                    <div className="min-w-0">
+                      <p className="truncate font-semibold text-ink">{c.name}</p>
+                      <p className="truncate font-mono text-xs text-ink-light">
                         /{c.slug}
+                      </p>
+                      <p className="mt-1 text-xs text-ink-light sm:hidden">
+                        {c._count.places} míst
                       </p>
                     </div>
                   </div>
                 </td>
-                <td className="px-4 py-3 text-ink-muted">
+                <td className="hidden px-3 py-3 text-ink-muted sm:table-cell">
                   {c._count.places}
                 </td>
-                <td className="px-4 py-3 text-right">
+                <td className="px-3 py-3 text-right">
                   <CategoryRow
                     id={c.id}
                     name={c.name}
@@ -94,6 +104,11 @@ export default async function AdminCategoriesPage() {
           </tbody>
         </table>
       </div>
+
+      <SubcategoryManager
+        categories={cats.map((c) => ({ id: c.id, name: c.name, slug: c.slug }))}
+        subcategories={subs}
+      />
     </>
   );
 }

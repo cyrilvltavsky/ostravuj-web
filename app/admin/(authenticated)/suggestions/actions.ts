@@ -60,6 +60,65 @@ export async function rejectSuggestion(
   revalidatePath(`/admin/suggestions/${id}`);
 }
 
+export async function deleteSuggestion(
+  id: string,
+): Promise<{ error: string | null }> {
+  const me = await requireEditor();
+  await prisma.suggestion.delete({ where: { id } }).catch(() => undefined);
+  await prisma.auditLog.create({
+    data: {
+      actorId: me.id,
+      action: "DELETE",
+      entityType: "Suggestion",
+      entityId: id,
+    },
+  });
+  revalidatePath("/admin/suggestions");
+  return { error: null };
+}
+
+export async function bulkSuggestionAction(
+  ids: string[],
+  op: "REJECT" | "DELETE",
+): Promise<{ ok: number; error: string | null }> {
+  const me = await requireEditor();
+  if (!Array.isArray(ids) || ids.length === 0)
+    return { ok: 0, error: "Žádné návrhy nevybrány." };
+
+  let ok = 0;
+  for (const id of ids) {
+    try {
+      if (op === "DELETE") {
+        await prisma.suggestion.delete({ where: { id } });
+      } else {
+        await prisma.suggestion.update({
+          where: { id },
+          data: {
+            status: "REJECTED",
+            reviewedById: me.id,
+            reviewedAt: new Date(),
+          },
+        });
+      }
+      await prisma.auditLog.create({
+        data: {
+          actorId: me.id,
+          action: op,
+          entityType: "Suggestion",
+          entityId: id,
+          metadata: { bulk: true },
+        },
+      });
+      ok++;
+    } catch (e) {
+      console.error("[bulkSuggestionAction]", op, id, e);
+    }
+  }
+
+  revalidatePath("/admin/suggestions");
+  return { ok, error: null };
+}
+
 export async function reopenSuggestion(id: string): Promise<void> {
   const me = await requireEditor();
   await prisma.suggestion.update({

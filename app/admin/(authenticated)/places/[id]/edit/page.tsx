@@ -18,7 +18,7 @@ export default async function EditPlacePage({
   const { id } = await params;
   const { saved } = await searchParams;
 
-  const [place, categories] = await Promise.all([
+  const [place, categories, subcategoryOptions] = await Promise.all([
     prisma.place.findUnique({
       where: { id },
       include: {
@@ -30,6 +30,10 @@ export default async function EditPlacePage({
     prisma.category.findMany({
       orderBy: { sortOrder: "asc" },
       select: { id: true, name: true, slug: true },
+    }),
+    prisma.subcategory.findMany({
+      orderBy: [{ categoryId: "asc" }, { sortOrder: "asc" }],
+      select: { slug: true, name: true },
     }),
   ]);
 
@@ -58,6 +62,7 @@ export default async function EditPlacePage({
         placeId={id}
         saved={saved === "1"}
         categories={categories}
+        subcategoryOptions={subcategoryOptions}
         defaults={{
           name: place.name,
           slug: place.slug,

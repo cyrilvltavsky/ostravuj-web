@@ -6,20 +6,27 @@ type PlaceCardProps = {
   place: Place;
 };
 
+/**
+ * On mobile: photo stacked on top, text below (classic card).
+ * On md+ (desktop): horizontal split — photo takes ~50%, text on the
+ * right like e-commerce detail previews.
+ */
 export function PlaceCard({ place }: PlaceCardProps) {
-  const subLabel = SUBCATEGORY_LABELS[place.subcategory];
+  const subLabel =
+    SUBCATEGORY_LABELS[place.subcategory] ?? place.subcategory;
 
   return (
     <Link
       href={{ pathname: `/${place.category}/${place.slug}` }}
-      className="group flex flex-col overflow-hidden rounded-card-lg border border-line bg-card text-left transition-all hover:-translate-y-1 hover:border-transparent hover:shadow-soft-lg"
+      className="group flex flex-col overflow-hidden rounded-card-lg border border-line bg-card text-left transition-all hover:-translate-y-1 hover:border-line-hover hover:shadow-soft-lg md:flex-row"
     >
-      <div className="relative aspect-[4/3] overflow-hidden bg-surface">
+      {/* Photo */}
+      <div className="relative aspect-[4/3] w-full overflow-hidden bg-surface md:aspect-auto md:w-1/2 md:shrink-0">
         <Image
           src={place.image}
           alt={place.name}
           fill
-          sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 33vw"
+          sizes="(max-width: 768px) 100vw, (max-width: 1280px) 40vw, 380px"
           className="object-cover transition-transform duration-500 group-hover:scale-105"
         />
         {place.discountCode ? (
@@ -32,11 +39,17 @@ export function PlaceCard({ place }: PlaceCardProps) {
           </span>
         )}
       </div>
-      <div className="flex flex-1 flex-col px-5 pb-6 pt-5">
+
+      {/* Text */}
+      <div className="flex flex-1 flex-col px-5 pb-6 pt-5 md:p-6">
         <div className="mb-2 flex items-center gap-2 text-[12px] font-medium uppercase tracking-wider text-ink-light">
           <span>{place.district}</span>
-          <span className="h-[3px] w-[3px] rounded-full bg-ink-light" />
-          <span>{subLabel}</span>
+          {subLabel ? (
+            <>
+              <span className="h-[3px] w-[3px] rounded-full bg-ink-light" />
+              <span>{subLabel}</span>
+            </>
+          ) : null}
         </div>
         <h3 className="mb-2.5 text-[19px] font-bold leading-tight tracking-tight text-ink">
           {place.name}

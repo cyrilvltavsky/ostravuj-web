@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState, useState } from "react";
 import { PhotoUploader } from "./photo-uploader";
 import type { PlaceFormState } from "@/app/admin/(authenticated)/places/actions";
@@ -41,16 +42,7 @@ const inputClass =
 
 const labelClass = "mb-1.5 block text-sm font-semibold text-ink";
 
-const SUBCATEGORY_OPTIONS = [
-  { value: "restaurace", label: "Restaurace" },
-  { value: "bistro", label: "Bistro" },
-  { value: "kavarna", label: "Kavárna" },
-  { value: "hospoda", label: "Hospoda" },
-  { value: "galerie", label: "Galerie" },
-  { value: "pamatka", label: "Památka" },
-  { value: "rodina", label: "Rodina" },
-  { value: "vyhlidka", label: "Vyhlídka" },
-];
+export type SubcategoryOption = { slug: string; name: string };
 
 function slugifyClient(s: string): string {
   return s
@@ -66,6 +58,7 @@ export function PlaceForm({
   action,
   defaults = {},
   categories,
+  subcategoryOptions,
   placeId,
   saved,
 }: {
@@ -75,6 +68,7 @@ export function PlaceForm({
   ) => Promise<PlaceFormState>;
   defaults?: PlaceFormDefaults;
   categories: PlaceFormCategory[];
+  subcategoryOptions: SubcategoryOption[];
   placeId?: string;
   saved?: boolean;
 }) {
@@ -218,15 +212,28 @@ export function PlaceForm({
             value={selectedSubcategories.join(",")}
           />
           <ChipGroup>
-            {SUBCATEGORY_OPTIONS.map((opt) => (
-              <Chip
-                key={opt.value}
-                active={selectedSubcategories.includes(opt.value)}
-                onClick={() => toggleSubcategory(opt.value)}
-              >
-                {opt.label}
-              </Chip>
-            ))}
+            {subcategoryOptions.length === 0 ? (
+              <p className="text-sm text-ink-light">
+                Zatím žádné subkategorie —{" "}
+                <Link
+                  href="/admin/categories"
+                  className="font-medium text-peach-strong hover:underline"
+                >
+                  vytvoř první v Kategoriích
+                </Link>
+                .
+              </p>
+            ) : (
+              subcategoryOptions.map((opt) => (
+                <Chip
+                  key={opt.slug}
+                  active={selectedSubcategories.includes(opt.slug)}
+                  onClick={() => toggleSubcategory(opt.slug)}
+                >
+                  {opt.name}
+                </Chip>
+              ))
+            )}
           </ChipGroup>
         </Field>
       </Section>
@@ -397,12 +404,12 @@ export function PlaceForm({
         />
       </Section>
 
-      <div className="sticky bottom-0 -mx-6 -mb-12 border-t border-line bg-card/95 px-6 py-4 backdrop-blur md:-mx-10 md:px-10">
-        <div className="flex flex-wrap items-center gap-3">
+      <div className="sticky bottom-0 -mx-4 -mb-6 border-t border-line bg-card/95 px-4 py-4 backdrop-blur sm:-mx-6 sm:-mb-12 sm:px-6 md:-mx-10 md:px-10">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <button
             type="submit"
             disabled={pending}
-            className="inline-flex items-center gap-2 rounded-[14px] bg-gradient-to-r from-peach-strong to-rose-strong px-7 py-3 text-[15px] font-semibold text-white shadow-soft-md transition hover:-translate-y-0.5 hover:shadow-soft-lg disabled:pointer-events-none disabled:opacity-60"
+            className="inline-flex items-center gap-2 rounded-[14px] bg-gradient-to-r from-peach-strong to-rose-strong px-5 py-3 text-[15px] font-semibold text-white shadow-soft-md transition hover:-translate-y-0.5 hover:shadow-soft-lg disabled:pointer-events-none disabled:opacity-60 sm:px-7"
           >
             {pending ? "Ukládám…" : placeId ? "Uložit změny" : "Publikovat místo"}
           </button>
@@ -411,13 +418,16 @@ export function PlaceForm({
             name="saveAsDraft"
             value="1"
             disabled={pending}
-            className="inline-flex items-center gap-2 rounded-[14px] border border-line-hover bg-card px-5 py-3 text-[15px] font-medium text-ink-muted transition hover:bg-surface hover:text-ink disabled:pointer-events-none disabled:opacity-60"
+            className="inline-flex items-center gap-2 rounded-[14px] border border-line-hover bg-card px-4 py-3 text-[15px] font-medium text-ink-muted transition hover:bg-surface hover:text-ink disabled:pointer-events-none disabled:opacity-60 sm:px-5"
           >
-            Uložit jako koncept
+            Koncept
           </button>
-          <p className="text-xs text-ink-light">
-            Koncept můžeš dokončit kdykoliv — nepublikuje se na webu.
-          </p>
+          <Link
+            href="/admin/places"
+            className="inline-flex items-center gap-2 rounded-[14px] border border-line-hover bg-card px-4 py-3 text-[15px] font-medium text-ink-muted transition hover:bg-surface hover:text-ink sm:px-5"
+          >
+            ← Zpět na seznam
+          </Link>
         </div>
       </div>
     </form>

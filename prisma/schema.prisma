@@ -56,9 +56,24 @@ model Category {
   sortOrder   Int      @default(0) @map("sort_order")
   createdAt   DateTime @default(now()) @map("created_at")
 
-  places Place[]
+  places        Place[]
+  subcategories Subcategory[]
 
   @@map("categories")
+}
+
+model Subcategory {
+  id         Int      @id @default(autoincrement())
+  slug       String   @unique
+  name       String
+  categoryId Int?     @map("category_id")
+  sortOrder  Int      @default(0) @map("sort_order")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  category Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  @@index([categoryId])
+  @@map("subcategories")
 }
 
 // ─────────────────────────────────────────────
@@ -105,6 +120,11 @@ model Place {
   showContacts Boolean @default(false) @map("show_contacts")
   showDiscount Boolean @default(false) @map("show_discount")
   featured     Boolean @default(false)
+
+  // Manual ordering: higher sortOrder shows first. New places default
+  // to 0; "TOP nahoru" sets sortOrder to (max + 1) so the place jumps
+  // to the start of admin lists and public listings.
+  sortOrder Int @default(0) @map("sort_order")
 
   // Optional embedded YouTube video (full URL)
   youtubeUrl String? @map("youtube_url")

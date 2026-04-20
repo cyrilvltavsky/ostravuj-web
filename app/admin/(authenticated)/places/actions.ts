@@ -379,6 +379,34 @@ export async function updatePlace(
   }
 }
 
+export async function pinPlaceToTop(id: string): Promise<void> {
+  await requireEditor();
+  const max = await prisma.place.aggregate({ _max: { sortOrder: true } });
+  const next = (max._max.sortOrder ?? 0) + 1;
+  await prisma.place.update({
+    where: { id },
+    data: { sortOrder: next },
+  });
+  revalidatePath("/admin/places");
+  revalidatePath("/");
+}
+
+export async function reorderPlaces(orderedIds: string[]): Promise<void> {
+  await requireEditor();
+  // Highest sortOrder = top. Walk the provided order from top → bottom.
+  const len = orderedIds.length;
+  await prisma.$transaction(
+    orderedIds.map((id, idx) =>
+      prisma.place.update({
+        where: { id },
+        data: { sortOrder: len - idx },
+      }),
+    ),
+  );
+  revalidatePath("/admin/places");
+  revalidatePath("/");
+}
+
 export async function deletePhotoAtSlot(placeId: string, sortOrder: number) {
   await requireEditor();
   const photo = await prisma.placePhoto.findFirst({

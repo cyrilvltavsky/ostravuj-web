@@ -74,7 +74,7 @@ export async function getAllPlaces(): Promise<Place[]> {
       photos: { orderBy: { sortOrder: "asc" }, take: 1 },
       discountCode: true,
     },
-    orderBy: { createdAt: "asc" },
+    orderBy: [{ sortOrder: "desc" }, { createdAt: "asc" }],
   });
   return rows.map((r) =>
     toPlaceView(r as unknown as NonNullable<PlaceWithRelations>),
@@ -114,7 +114,7 @@ export async function getPlacesByCategory(
       photos: { orderBy: { sortOrder: "asc" }, take: 1 },
       discountCode: true,
     },
-    orderBy: { createdAt: "asc" },
+    orderBy: [{ sortOrder: "desc" }, { createdAt: "asc" }],
   });
   return rows.map((r) =>
     toPlaceView(r as unknown as NonNullable<PlaceWithRelations>),
@@ -129,7 +129,7 @@ export async function getFeaturedPlaces(): Promise<Place[]> {
       photos: { orderBy: { sortOrder: "asc" }, take: 1 },
       discountCode: true,
     },
-    orderBy: { createdAt: "asc" },
+    orderBy: [{ sortOrder: "desc" }, { createdAt: "asc" }],
   });
   return rows.map((r) =>
     toPlaceView(r as unknown as NonNullable<PlaceWithRelations>),

@@ -5,7 +5,7 @@ import {
   getAllCategories,
   getAllPlaces,
 } from "@/lib/queries/places";
-import { SUBCATEGORY_LABELS, type SubcategorySlug } from "@/lib/places";
+import { prisma } from "@/lib/prisma";
 import { recommend } from "@/lib/recommender";
 import { RecommenderForm } from "./form";
 
@@ -37,15 +37,14 @@ export default async function RecommendPage({
     .map((s) => s.trim())
     .filter(Boolean);
 
-  const [categories, places] = await Promise.all([
+  const [categories, places, subs] = await Promise.all([
     getAllCategories(),
     getAllPlaces(),
+    prisma.subcategory.findMany({
+      orderBy: [{ categoryId: "asc" }, { sortOrder: "asc" }],
+      select: { slug: true, name: true },
+    }),
   ]);
-
-  // All distinct subcategories present in published places
-  const allSubs = Array.from(
-    new Set(places.map((p) => p.subcategory).filter(Boolean)),
-  );
 
   const hasInput =
     query.length > 0 || selected.length > 0 || selectedSubs.length > 0;
@@ -77,11 +76,7 @@ export default async function RecommendPage({
 
         <RecommenderForm
           categories={categories.map((c) => ({ slug: c.slug, name: c.title }))}
-          subcategories={allSubs.map((s) => ({
-            slug: s as string,
-            label:
-              SUBCATEGORY_LABELS[s as SubcategorySlug] ?? (s as string),
-          }))}
+          subcategories={subs.map((s) => ({ slug: s.slug, label: s.name }))}
           defaultQuery={query}
           defaultSelectedCategories={selected}
           defaultSelectedSubcategories={selectedSubs}
@@ -108,7 +103,7 @@ export default async function RecommendPage({
                     Seřazeno podle relevance
                   </p>
                 </div>
-                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="grid gap-6 md:grid-cols-2">
                   {scored.slice(0, 30).map(({ place, reasons }) => (
                     <div key={place.slug} className="flex flex-col gap-2">
                       <PlaceCard place={place} />
