@@ -74,7 +74,7 @@ export default async function HomePage() {
       {/* CATEGORIES */}
       <section className="py-10 pb-20">
         <div className="container-page">
-          <div className="grid gap-5 sm:grid-cols-2">
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {categories.map((cat, i) => (
               <AnimateOnScroll key={cat.slug} delay={i * 80}>
                 <CategoryCard
