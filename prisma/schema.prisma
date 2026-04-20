@@ -68,6 +68,7 @@ model Category {
 enum PlaceStatus {
   PUBLISHED
   ARCHIVED
+  DRAFT
 }
 
 model Place {
@@ -100,10 +101,13 @@ model Place {
   instagram String?
   facebook  String?
 
-  // Per-place admin toggles
-  showContacts Boolean @default(true) @map("show_contacts")
-  showDiscount Boolean @default(true) @map("show_discount")
+  // Per-place admin toggles (default OFF — opt-in to display)
+  showContacts Boolean @default(false) @map("show_contacts")
+  showDiscount Boolean @default(false) @map("show_discount")
   featured     Boolean @default(false)
+
+  // Optional embedded YouTube video (full URL)
+  youtubeUrl String? @map("youtube_url")
 
   createdById String?  @map("created_by") @db.Uuid
   createdBy   Profile? @relation("PlaceCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)

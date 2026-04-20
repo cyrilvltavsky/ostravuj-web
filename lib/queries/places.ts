@@ -38,6 +38,7 @@ function toPlaceView(p: NonNullable<PlaceWithRelations>): Place {
     shortDesc: p.shortDesc,
     discountCode: p.showDiscount ? (p.discountCode?.code ?? null) : null,
     image: mainPhoto,
+    youtubeUrl: p.youtubeUrl ?? null,
     contacts: {
       phone: p.phone ?? undefined,
       email: p.email ?? undefined,

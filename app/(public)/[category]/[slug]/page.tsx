@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { DiscountCode } from "@/components/discount-code";
-import { hasVisibleContacts, mapyComUrl } from "@/lib/places";
+import { hasVisibleContacts, mapyComUrl, youtubeIdFromUrl } from "@/lib/places";
 import {
   getAllCategories,
   getAllPlaceParams,
@@ -57,6 +57,7 @@ export default async function PlaceDetailPage({
   const mapsUrl = mapyComUrl(place.address);
   const showContacts = hasVisibleContacts(place);
   const c = place.contacts;
+  const ytId = youtubeIdFromUrl(place.youtubeUrl);
   // Gallery: pad with main photo up to 5 placeholders for the layout
   const galleryPhotos = [
     ...allPhotos,
@@ -129,6 +130,23 @@ export default async function PlaceDetailPage({
             <p className="mb-8 text-[18px] leading-[1.75] text-ink">
               {place.shortDesc}
             </p>
+
+            {ytId ? (
+              <>
+                <h2 className="mb-3.5 text-[13px] font-bold uppercase tracking-wider text-ink-light">
+                  Video
+                </h2>
+                <div className="mb-8 aspect-video overflow-hidden rounded-card-lg bg-ink">
+                  <iframe
+                    src={`https://www.youtube.com/embed/${ytId}`}
+                    title={`${place.name} — video`}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                    className="h-full w-full"
+                  />
+                </div>
+              </>
+            ) : null}
 
             <h2 className="mb-3.5 text-[13px] font-bold uppercase tracking-wider text-ink-light">
               Štítky

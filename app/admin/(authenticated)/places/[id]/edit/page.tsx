@@ -83,6 +83,7 @@ export default async function EditPlacePage({
           featured: place.featured,
           status: place.status as "PUBLISHED" | "ARCHIVED",
           discountCode: place.discountCode?.code ?? null,
+          youtubeUrl: place.youtubeUrl,
           photos: place.photos.map((ph) => ({
             url: ph.url,
             sortOrder: ph.sortOrder,

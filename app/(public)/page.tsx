@@ -7,8 +7,10 @@ import {
   getAllCategories,
   getCategoryCounts,
   getFeaturedPlaces,
+  getSubcategoriesInCategory,
   getTotalPlaceCount,
 } from "@/lib/queries/places";
+import { SUBCATEGORY_LABELS, type SubcategorySlug } from "@/lib/places";
 
 export const revalidate = 60;
 
@@ -19,6 +21,9 @@ export default async function HomePage() {
     getFeaturedPlaces(),
     getTotalPlaceCount(),
   ]);
+  const subsByCategory = await Promise.all(
+    categories.map((c) => getSubcategoriesInCategory(c.slug)),
+  );
 
   return (
     <>
@@ -42,7 +47,9 @@ export default async function HomePage() {
         />
         <div className="container-page">
           <h1 className="mb-6 max-w-[820px] text-[clamp(40px,7vw,72px)] font-extrabold leading-[1.05] tracking-[-0.035em] text-ink">
-            Objevuj nejlepší místa
+            Objevuj nejlepší
+            <br />
+            místa
             <br />
             <span className="text-gradient">v Ostravě</span>.
           </h1>
@@ -67,10 +74,21 @@ export default async function HomePage() {
       {/* CATEGORIES */}
       <section className="py-10 pb-20">
         <div className="container-page">
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-5 sm:grid-cols-2">
             {categories.map((cat, i) => (
               <AnimateOnScroll key={cat.slug} delay={i * 80}>
-                <CategoryCard category={cat} count={counts[cat.slug]} />
+                <CategoryCard
+                  category={cat}
+                  count={counts[cat.slug]}
+                  subcategories={
+                    (subsByCategory[i] as SubcategorySlug[])
+                      .map(
+                        (s) =>
+                          SUBCATEGORY_LABELS[s as SubcategorySlug] ?? s,
+                      )
+                      .slice(0, 6)
+                  }
+                />
               </AnimateOnScroll>
             ))}
           </div>

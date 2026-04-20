@@ -64,12 +64,19 @@ function readFormPlace(formData: FormData) {
   const showContacts = formData.get("showContacts") === "on";
   const showDiscount = formData.get("showDiscount") === "on";
   const featured = formData.get("featured") === "on";
-  const status =
-    formData.get("status") === "ARCHIVED"
-      ? ("ARCHIVED" as const)
-      : ("PUBLISHED" as const);
+  const saveAsDraft = formData.get("saveAsDraft") === "1";
+  const rawStatus = String(formData.get("status") ?? "");
+  const status: "PUBLISHED" | "ARCHIVED" | "DRAFT" = saveAsDraft
+    ? "DRAFT"
+    : rawStatus === "ARCHIVED"
+      ? "ARCHIVED"
+      : rawStatus === "DRAFT"
+        ? "DRAFT"
+        : "PUBLISHED";
   const discountCode =
     String(formData.get("discountCode") ?? "").trim() || null;
+  const youtubeUrl =
+    String(formData.get("youtubeUrl") ?? "").trim() || null;
 
   return {
     name,
@@ -93,14 +100,15 @@ function readFormPlace(formData: FormData) {
     featured,
     status,
     discountCode,
+    youtubeUrl,
   };
 }
 
 function validate(d: ReturnType<typeof readFormPlace>): string | null {
+  // Minimální požadavky: pouze název + alespoň jedna kategorie.
+  // Adresa, popis i fotky jsou volitelné — můžeš doplnit později.
   if (!d.name) return "Vyplňte název.";
   if (!d.slug) return "Slug nemůže být prázdný.";
-  if (!d.address) return "Vyplňte adresu.";
-  if (!d.shortDesc) return "Vyplňte krátký popis.";
   if (!d.categoryId || d.categorySlugs.length === 0)
     return "Vyberte alespoň jednu kategorii.";
   return null;
@@ -195,6 +203,7 @@ export async function createPlace(
         showDiscount: data.showDiscount,
         featured: data.featured,
         status: data.status,
+        youtubeUrl: data.youtubeUrl,
         createdById: profile.id,
       },
     });
@@ -307,6 +316,7 @@ export async function updatePlace(
         showDiscount: data.showDiscount,
         featured: data.featured,
         status: data.status,
+        youtubeUrl: data.youtubeUrl,
       },
     });
 

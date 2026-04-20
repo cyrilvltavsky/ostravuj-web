@@ -33,6 +33,7 @@ export type Place = {
   shortDesc: string;
   discountCode: string | null;
   image: string;
+  youtubeUrl?: string | null;
   contacts?: PlaceContacts;
   showContacts?: boolean;
 };
@@ -74,4 +75,24 @@ export function hasVisibleContacts(place: Place): boolean {
   const c = place.contacts;
   if (!c) return false;
   return Boolean(c.phone || c.email || c.website || c.instagram || c.facebook);
+}
+
+/** Extracts a YouTube video ID from any common URL form. */
+export function youtubeIdFromUrl(url: string | null | undefined): string | null {
+  if (!url) return null;
+  const trimmed = url.trim();
+  if (!trimmed) return null;
+  const patterns = [
+    /[?&]v=([A-Za-z0-9_-]{11})/, // watch?v=ID
+    /youtu\.be\/([A-Za-z0-9_-]{11})/, // short URL
+    /\/embed\/([A-Za-z0-9_-]{11})/, // embed URL
+    /\/shorts\/([A-Za-z0-9_-]{11})/, // shorts
+  ];
+  for (const re of patterns) {
+    const m = trimmed.match(re);
+    if (m) return m[1];
+  }
+  // Bare 11-char ID
+  if (/^[A-Za-z0-9_-]{11}$/.test(trimmed)) return trimmed;
+  return null;
 }

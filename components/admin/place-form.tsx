@@ -30,8 +30,9 @@ export type PlaceFormDefaults = {
   showContacts?: boolean;
   showDiscount?: boolean;
   featured?: boolean;
-  status?: "PUBLISHED" | "ARCHIVED";
+  status?: "PUBLISHED" | "ARCHIVED" | "DRAFT";
   discountCode?: string | null;
+  youtubeUrl?: string | null;
   photos?: PlaceFormPhoto[];
 };
 
@@ -261,12 +262,10 @@ export function PlaceForm({
         </div>
         <Field
           label="Krátký popis"
-          required
-          hint="Zobrazí se v kartě i detailu"
+          hint="Zobrazí se v kartě i detailu (volitelné — můžeš doplnit později)"
         >
           <textarea
             name="shortDesc"
-            required
             rows={3}
             defaultValue={defaults.shortDesc ?? ""}
             className={inputClass + " resize-y"}
@@ -340,7 +339,7 @@ export function PlaceForm({
         </div>
         <Toggle
           name="showContacts"
-          defaultChecked={defaults.showContacts ?? true}
+          defaultChecked={defaults.showContacts ?? false}
           label="Zobrazit kontakty na detailu"
         />
       </Section>
@@ -357,9 +356,24 @@ export function PlaceForm({
         </Field>
         <Toggle
           name="showDiscount"
-          defaultChecked={defaults.showDiscount ?? true}
+          defaultChecked={defaults.showDiscount ?? false}
           label="Zobrazit slevový kód na detailu"
         />
+      </Section>
+
+      <Section
+        title="YouTube video"
+        hint="Volitelné — vlož celou URL videa (např. https://www.youtube.com/watch?v=…)"
+      >
+        <Field label="URL">
+          <input
+            type="text"
+            name="youtubeUrl"
+            defaultValue={defaults.youtubeUrl ?? ""}
+            className={inputClass}
+            placeholder="https://www.youtube.com/watch?v=…"
+          />
+        </Field>
       </Section>
 
       <Section title="Publikace">
@@ -371,6 +385,7 @@ export function PlaceForm({
               className={inputClass}
             >
               <option value="PUBLISHED">Publikované</option>
+              <option value="DRAFT">Koncept</option>
               <option value="ARCHIVED">Archivované</option>
             </select>
           </Field>
@@ -383,13 +398,27 @@ export function PlaceForm({
       </Section>
 
       <div className="sticky bottom-0 -mx-6 -mb-12 border-t border-line bg-white/95 px-6 py-4 backdrop-blur md:-mx-10 md:px-10">
-        <button
-          type="submit"
-          disabled={pending}
-          className="inline-flex items-center gap-2 rounded-[14px] bg-gradient-to-r from-peach-strong to-rose-strong px-7 py-3 text-[15px] font-semibold text-white shadow-soft-md transition hover:-translate-y-0.5 hover:shadow-soft-lg disabled:pointer-events-none disabled:opacity-60"
-        >
-          {pending ? "Ukládám…" : placeId ? "Uložit změny" : "Vytvořit místo"}
-        </button>
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            type="submit"
+            disabled={pending}
+            className="inline-flex items-center gap-2 rounded-[14px] bg-gradient-to-r from-peach-strong to-rose-strong px-7 py-3 text-[15px] font-semibold text-white shadow-soft-md transition hover:-translate-y-0.5 hover:shadow-soft-lg disabled:pointer-events-none disabled:opacity-60"
+          >
+            {pending ? "Ukládám…" : placeId ? "Uložit změny" : "Publikovat místo"}
+          </button>
+          <button
+            type="submit"
+            name="saveAsDraft"
+            value="1"
+            disabled={pending}
+            className="inline-flex items-center gap-2 rounded-[14px] border border-line-hover bg-white px-5 py-3 text-[15px] font-medium text-ink-muted transition hover:bg-surface hover:text-ink disabled:pointer-events-none disabled:opacity-60"
+          >
+            Uložit jako koncept
+          </button>
+          <p className="text-xs text-ink-light">
+            Koncept můžeš dokončit kdykoliv — nepublikuje se na webu.
+          </p>
+        </div>
       </div>
     </form>
   );
