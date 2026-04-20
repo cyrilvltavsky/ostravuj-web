@@ -136,24 +136,21 @@ export async function getFeaturedPlaces(): Promise<Place[]> {
   );
 }
 
-export async function getCategoryCounts(): Promise<
-  Record<CategorySlug, number>
-> {
-  const grouped = await prisma.place.groupBy({
-    by: ["categoryId"],
-    where: { status: "PUBLISHED" },
-    _count: true,
+export async function getCategoryCounts(): Promise<Record<string, number>> {
+  // Count places per category by primary categoryId AND by membership in
+  // categorySlugs (a place tagged in multiple categories shows up in
+  // each one's count).
+  const cats = await prisma.category.findMany({
+    select: { id: true, slug: true },
   });
-  const cats = await prisma.category.findMany();
-  const out: Record<CategorySlug, number> = {
-    gastro: 0,
-    aktivity: 0,
-    rande: 0,
-    zdarma: 0,
-  };
-  for (const g of grouped) {
-    const slug = cats.find((c) => c.id === g.categoryId)?.slug as CategorySlug;
-    if (slug) out[slug] = g._count;
+  const out: Record<string, number> = {};
+  for (const c of cats) {
+    out[c.slug] = await prisma.place.count({
+      where: {
+        status: "PUBLISHED",
+        OR: [{ categoryId: c.id }, { categorySlugs: { has: c.slug } }],
+      },
+    });
   }
   return out;
 }

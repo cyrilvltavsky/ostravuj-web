@@ -130,7 +130,7 @@ export function RandomPickerProvider({
               <button
                 type="button"
                 onClick={goToPicked}
-                className="flex flex-1 items-center justify-center gap-2 rounded-[14px] bg-ink px-6 py-3.5 text-[15px] font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#1f2937] hover:shadow-soft-md"
+                className="flex flex-1 items-center justify-center gap-2 rounded-[14px] bg-gradient-to-r from-peach-strong to-rose-strong px-6 py-3.5 text-[15px] font-semibold text-white transition hover:-translate-y-0.5 hover:shadow-soft-md"
               >
                 Zobrazit detail →
               </button>

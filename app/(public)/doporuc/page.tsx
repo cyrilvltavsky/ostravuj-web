@@ -5,6 +5,7 @@ import {
   getAllCategories,
   getAllPlaces,
 } from "@/lib/queries/places";
+import { SUBCATEGORY_LABELS, type SubcategorySlug } from "@/lib/places";
 import { recommend } from "@/lib/recommender";
 import { RecommenderForm } from "./form";
 
@@ -16,7 +17,7 @@ export const metadata: Metadata = {
 
 export const revalidate = 60;
 
-type SP = { q?: string; c?: string };
+type SP = { q?: string; c?: string; s?: string };
 
 export default async function RecommendPage({
   searchParams,
@@ -30,15 +31,30 @@ export default async function RecommendPage({
     .split(",")
     .map((s) => s.trim())
     .filter(Boolean);
+  const selectedSubs = (sp.s ?? "")
+    .toString()
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
 
   const [categories, places] = await Promise.all([
     getAllCategories(),
     getAllPlaces(),
   ]);
 
-  const hasInput = query.length > 0 || selected.length > 0;
+  // All distinct subcategories present in published places
+  const allSubs = Array.from(
+    new Set(places.map((p) => p.subcategory).filter(Boolean)),
+  );
+
+  const hasInput =
+    query.length > 0 || selected.length > 0 || selectedSubs.length > 0;
   const scored = hasInput
-    ? recommend(places, { query, categories: selected })
+    ? recommend(places, {
+        query,
+        categories: selected,
+        subcategories: selectedSubs,
+      })
     : [];
 
   return (
@@ -61,8 +77,14 @@ export default async function RecommendPage({
 
         <RecommenderForm
           categories={categories.map((c) => ({ slug: c.slug, name: c.title }))}
+          subcategories={allSubs.map((s) => ({
+            slug: s as string,
+            label:
+              SUBCATEGORY_LABELS[s as SubcategorySlug] ?? (s as string),
+          }))}
           defaultQuery={query}
-          defaultSelected={selected}
+          defaultSelectedCategories={selected}
+          defaultSelectedSubcategories={selectedSubs}
         />
 
         {hasInput ? (

@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { DiscountCode } from "@/components/discount-code";
+import { PlaceGallery } from "@/components/place-gallery";
 import { hasVisibleContacts, mapyComUrl, youtubeIdFromUrl } from "@/lib/places";
 import {
   getAllCategories,
@@ -58,11 +58,9 @@ export default async function PlaceDetailPage({
   const showContacts = hasVisibleContacts(place);
   const c = place.contacts;
   const ytId = youtubeIdFromUrl(place.youtubeUrl);
-  // Gallery: pad with main photo up to 5 placeholders for the layout
-  const galleryPhotos = [
-    ...allPhotos,
-    ...Array(Math.max(0, 5 - allPhotos.length)).fill(place.image),
-  ].slice(0, 5);
+  // Gallery: real photos only — no padding
+  const galleryPhotos =
+    allPhotos.length > 0 ? allPhotos : place.image ? [place.image] : [];
 
   return (
     <>
@@ -94,32 +92,8 @@ export default async function PlaceDetailPage({
       </section>
 
       <div className="container-page">
-        {/* Gallery — uses the same image multiple times until photos table is wired up */}
-        <div className="mb-12 grid aspect-[16/9] grid-cols-1 grid-rows-1 gap-3 overflow-hidden rounded-card-lg md:aspect-[16/9] md:grid-cols-[2fr_1fr_1fr] md:grid-rows-2">
-          <div className="relative bg-surface md:row-span-2">
-            <Image
-              src={galleryPhotos[0]}
-              alt={place.name}
-              fill
-              sizes="(max-width: 768px) 100vw, 50vw"
-              className="object-cover"
-              priority
-            />
-          </div>
-          {galleryPhotos.slice(1, 5).map((url, i) => (
-            <div
-              key={`${url}-${i}`}
-              className="relative hidden bg-surface md:block"
-            >
-              <Image
-                src={url}
-                alt=""
-                fill
-                sizes="25vw"
-                className="object-cover"
-              />
-            </div>
-          ))}
+        <div className="mb-12">
+          <PlaceGallery photos={galleryPhotos} alt={place.name} />
         </div>
 
         <div className="grid gap-12 pb-20 md:grid-cols-[2fr_1fr]">
@@ -175,7 +149,7 @@ export default async function PlaceDetailPage({
                 href={mapsUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex w-full items-center justify-center gap-2.5 rounded-xl bg-ink px-5 py-3.5 text-[15px] font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#1f2937]"
+                className="flex w-full items-center justify-center gap-2.5 rounded-xl bg-ink px-5 py-3.5 text-[15px] font-semibold text-white transition hover:-translate-y-0.5 hover:bg-gradient-to-r hover:from-peach-strong hover:to-rose-strong hover:shadow-soft-md"
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg> Navigovat přes Mapy.com
               </a>

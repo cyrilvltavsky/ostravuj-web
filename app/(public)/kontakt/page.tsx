@@ -110,7 +110,7 @@ export default async function ContactPage() {
           </div>
 
           {/* SUGGEST CTA */}
-          <div className="mt-10 relative overflow-hidden rounded-card-xl bg-gradient-to-br from-[#fff7ed] via-[#fef3f2] to-[#f5f3ff] p-8 text-center shadow-soft md:p-10">
+          <div className="mt-10 relative overflow-hidden rounded-card-xl bg-gradient-to-br from-[#fff7ed] via-[#fef3f2] to-[#f5f3ff] p-8 text-center shadow-soft md:p-10 dark:from-[#1f1f23] dark:via-[#27272a] dark:to-[#1a1a1d]">
             <span
               aria-hidden
               className="absolute left-8 top-6 opacity-50"
@@ -123,10 +123,10 @@ export default async function ContactPage() {
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-violet-400"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
             </span>
-            <h3 className="text-[clamp(20px,3vw,28px)] font-extrabold tracking-tight text-ink">
+            <h3 className="text-[clamp(20px,3vw,28px)] font-extrabold tracking-tight text-ink dark:text-white">
               Máte tip na další místo?
             </h3>
-            <p className="mx-auto mt-2 max-w-md text-[16px] text-ink-muted">
+            <p className="mx-auto mt-2 max-w-md text-[16px] text-ink-muted dark:text-white/80">
               Pošlete nám svůj návrh a my se na něj podíváme. Třeba ho
               přidáme do našeho výběru.
             </p>

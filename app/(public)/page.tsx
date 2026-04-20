@@ -47,11 +47,11 @@ export default async function HomePage() {
         />
         <div className="container-page">
           <h1 className="mb-6 max-w-[820px] text-[clamp(40px,7vw,72px)] font-extrabold leading-[1.05] tracking-[-0.035em] text-ink">
-            Objevuj nejlepší
+            Objevuj
             <br />
-            místa
+            nejlepší místa
             <br />
-            <span className="text-gradient">v Ostravě</span>.
+            <span className="text-gradient">v Ostravě</span>
           </h1>
           <p className="mb-10 max-w-[620px] text-[19px] text-ink-muted">
             Ručně vybrané restaurace, kavárny, hospody, galerie, památky i tipy
@@ -133,7 +133,7 @@ export default async function HomePage() {
       <AnimateOnScroll>
         <section className="py-20">
           <div className="container-page">
-            <div className="relative overflow-hidden rounded-card-xl bg-gradient-to-br from-[#fff7ed] via-[#fef3f2] to-[#f5f3ff] px-14 py-16 text-center">
+            <div className="relative overflow-hidden rounded-card-xl bg-gradient-to-br from-[#fff7ed] via-[#fef3f2] to-[#f5f3ff] px-14 py-16 text-center dark:from-[#1f1f23] dark:via-[#27272a] dark:to-[#1a1a1d]">
               <span
                 aria-hidden
                 className="absolute left-14 top-10 opacity-60"
@@ -146,13 +146,13 @@ export default async function HomePage() {
               >
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-violet-400"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
               </span>
-              <span className="text-[13px] font-bold uppercase tracking-wider text-peach-deep">
+              <span className="text-[13px] font-bold uppercase tracking-wider text-peach-deep dark:text-peach-strong">
                 Nevíš kam?
               </span>
-              <h2 className="mb-3.5 mt-3 text-[clamp(28px,5vw,44px)] font-extrabold tracking-tight text-ink">
+              <h2 className="mb-3.5 mt-3 text-[clamp(28px,5vw,44px)] font-extrabold tracking-tight text-ink dark:text-white">
                 Objevuj nejlepší místa v Ostravě
               </h2>
-              <p className="mx-auto mb-8 max-w-[500px] text-[17px] text-ink-muted">
+              <p className="mx-auto mb-8 max-w-[500px] text-[17px] text-ink-muted dark:text-white/80">
                 Máme pro tebe {total} ověřených míst. Klikni a my ti jedno
                 náhodně vybereme. Třeba objevíš něco, co bys sám nenašel.
               </p>

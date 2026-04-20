@@ -1,7 +1,13 @@
 // Types + tiny pure helpers shared by server + client.
 // Data now lives in the database — see lib/queries/places.ts.
 
-export type CategorySlug = "gastro" | "aktivity" | "rande" | "zdarma";
+export type CategorySlug =
+  | "gastro"
+  | "aktivity"
+  | "rande"
+  | "zdarma"
+  | "rodina"
+  | (string & {}); // allow new admin-created slugs without type errors
 
 export type SubcategorySlug =
   | "restaurace"
