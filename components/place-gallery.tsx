@@ -143,14 +143,14 @@ export function PlaceGallery({
             </>
           ) : null}
 
-          {/* Image */}
-          <div className="relative mx-auto h-[80vh] w-full max-w-[1200px]">
+          {/* Image — same 4:3 cover crop as thumbnails */}
+          <div className="relative mx-auto aspect-[4/3] w-full max-w-[1200px] overflow-hidden rounded-card-lg bg-ink">
             <Image
               src={photos[active]}
               alt={alt}
               fill
-              sizes="100vw"
-              className="object-contain"
+              sizes="(max-width: 1280px) 100vw, 1200px"
+              className="object-cover"
               priority
             />
           </div>

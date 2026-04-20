@@ -7,9 +7,9 @@ type PlaceCardProps = {
 };
 
 /**
- * On mobile: photo stacked on top, text below (classic card).
- * On md+ (desktop): horizontal split — photo takes ~50%, text on the
- * right like e-commerce detail previews.
+ * Vertical card: 4:3 photo on top, title + meta + tags below.
+ * Identical layout on mobile and desktop — listing grids place
+ * three of these per row on lg screens.
  */
 export function PlaceCard({ place }: PlaceCardProps) {
   const subLabel =
@@ -18,15 +18,15 @@ export function PlaceCard({ place }: PlaceCardProps) {
   return (
     <Link
       href={{ pathname: `/${place.category}/${place.slug}` }}
-      className="group flex flex-col overflow-hidden rounded-card-lg border border-line bg-card text-left transition-all hover:-translate-y-1 hover:border-line-hover hover:shadow-soft-lg md:flex-row"
+      className="group flex flex-col overflow-hidden rounded-card-lg border border-line bg-card text-left transition-all hover:-translate-y-1 hover:border-line-hover hover:shadow-soft-lg"
     >
       {/* Photo */}
-      <div className="relative aspect-[4/3] w-full overflow-hidden bg-surface md:aspect-auto md:w-1/2 md:shrink-0">
+      <div className="relative aspect-[4/3] w-full overflow-hidden bg-surface">
         <Image
           src={place.image}
           alt={place.name}
           fill
-          sizes="(max-width: 768px) 100vw, (max-width: 1280px) 40vw, 380px"
+          sizes="(max-width: 600px) 100vw, (max-width: 1024px) 50vw, 33vw"
           className="object-cover transition-transform duration-500 group-hover:scale-105"
         />
         {place.discountCode ? (
@@ -41,7 +41,7 @@ export function PlaceCard({ place }: PlaceCardProps) {
       </div>
 
       {/* Text */}
-      <div className="flex flex-1 flex-col px-5 pb-6 pt-5 md:p-6">
+      <div className="flex flex-1 flex-col px-5 pb-6 pt-5">
         <div className="mb-2 flex items-center gap-2 text-[12px] font-medium uppercase tracking-wider text-ink-light">
           <span>{place.district}</span>
           {subLabel ? (

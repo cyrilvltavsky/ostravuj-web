@@ -404,30 +404,30 @@ export function PlaceForm({
         />
       </Section>
 
-      <div className="sticky bottom-0 -mx-4 -mb-6 border-t border-line bg-card/95 px-4 py-4 backdrop-blur sm:-mx-6 sm:-mb-12 sm:px-6 md:-mx-10 md:px-10">
-        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-          <button
-            type="submit"
-            disabled={pending}
-            className="inline-flex items-center gap-2 rounded-[14px] bg-gradient-to-r from-peach-strong to-rose-strong px-5 py-3 text-[15px] font-semibold text-white shadow-soft-md transition hover:-translate-y-0.5 hover:shadow-soft-lg disabled:pointer-events-none disabled:opacity-60 sm:px-7"
+      <div className="sticky bottom-0 -mx-4 -mb-6 border-t border-line bg-card/95 px-4 py-3 backdrop-blur sm:-mx-6 sm:-mb-12 sm:px-6 md:-mx-10 md:px-10">
+        <div className="flex flex-nowrap items-center gap-2 overflow-x-auto">
+          <Link
+            href="/admin/places"
+            className="inline-flex shrink-0 items-center rounded-[14px] border border-line-hover bg-card px-3 py-2.5 text-sm font-medium text-ink-muted transition hover:bg-surface hover:text-ink sm:px-4"
           >
-            {pending ? "Ukládám…" : placeId ? "Uložit změny" : "Publikovat místo"}
-          </button>
+            ← Přehled
+          </Link>
           <button
             type="submit"
             name="saveAsDraft"
             value="1"
             disabled={pending}
-            className="inline-flex items-center gap-2 rounded-[14px] border border-line-hover bg-card px-4 py-3 text-[15px] font-medium text-ink-muted transition hover:bg-surface hover:text-ink disabled:pointer-events-none disabled:opacity-60 sm:px-5"
+            className="inline-flex shrink-0 items-center rounded-[14px] border border-line-hover bg-card px-3 py-2.5 text-sm font-medium text-ink-muted transition hover:bg-surface hover:text-ink disabled:pointer-events-none disabled:opacity-60 sm:px-4"
           >
             Koncept
           </button>
-          <Link
-            href="/admin/places"
-            className="inline-flex items-center gap-2 rounded-[14px] border border-line-hover bg-card px-4 py-3 text-[15px] font-medium text-ink-muted transition hover:bg-surface hover:text-ink sm:px-5"
+          <button
+            type="submit"
+            disabled={pending}
+            className="inline-flex shrink-0 items-center rounded-[14px] bg-gradient-to-r from-peach-strong to-rose-strong px-4 py-2.5 text-sm font-semibold text-white shadow-soft-md transition hover:-translate-y-0.5 hover:shadow-soft-lg disabled:pointer-events-none disabled:opacity-60 sm:px-6"
           >
-            ← Zpět na seznam
-          </Link>
+            {pending ? "Ukládám…" : placeId ? "Uložit změny" : "Publikovat"}
+          </button>
         </div>
       </div>
     </form>

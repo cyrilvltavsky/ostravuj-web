@@ -103,7 +103,7 @@ export default async function RecommendPage({
                     Seřazeno podle relevance
                   </p>
                 </div>
-                <div className="grid gap-6 md:grid-cols-2">
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                   {scored.slice(0, 30).map(({ place, reasons }) => (
                     <div key={place.slug} className="flex flex-col gap-2">
                       <PlaceCard place={place} />
