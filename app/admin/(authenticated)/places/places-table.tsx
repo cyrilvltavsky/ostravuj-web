@@ -9,6 +9,7 @@ import {
   bulkDeletePlaces,
   deletePlace,
   pinPlaceToTop,
+  reorderPlaces,
 } from "./actions";
 
 export type PlaceRow = {
@@ -49,9 +50,28 @@ export function PlacesTable({
   const [query, setQuery] = useState("");
   const [activeCat, setActiveCat] = useState<string>("all");
 
+  // Drag-and-drop ordering — only available when no filter/search is active
+  const [orderMode, setOrderMode] = useState(false);
+  const [order, setOrder] = useState<string[]>(rows.map((r) => r.id));
+  const [draggedId, setDraggedId] = useState<string | null>(null);
+  const [orderDirty, setOrderDirty] = useState(false);
+
+  // Re-sync local order when the server-provided rows change (e.g. after
+  // pin-to-top or refresh). Skip while we're actively reordering.
+  if (!orderMode && !orderDirty && order.join(",") !== rows.map((r) => r.id).join(",")) {
+    setOrder(rows.map((r) => r.id));
+  }
+
+  const orderedRows = useMemo(() => {
+    if (!orderMode) return rows;
+    const byId = new Map(rows.map((r) => [r.id, r]));
+    return order.map((id) => byId.get(id)).filter(Boolean) as PlaceRow[];
+  }, [orderMode, order, rows]);
+
   const filteredRows = useMemo(() => {
+    const source = orderMode ? orderedRows : rows;
     const q = normalize(query.trim());
-    return rows.filter((r) => {
+    return source.filter((r) => {
       if (activeCat !== "all" && r.categorySlug !== activeCat) return false;
       if (q.length === 0) return true;
       const haystack = normalize(
@@ -59,7 +79,43 @@ export function PlacesTable({
       );
       return haystack.includes(q);
     });
-  }, [rows, query, activeCat]);
+  }, [orderMode, orderedRows, rows, query, activeCat]);
+
+  const dndActive =
+    orderMode && query.trim() === "" && activeCat === "all";
+
+  function handleDragStart(id: string) {
+    setDraggedId(id);
+  }
+  function handleDragOver(e: React.DragEvent, overId: string) {
+    if (!draggedId || draggedId === overId) return;
+    e.preventDefault();
+    setOrder((prev) => {
+      const next = [...prev];
+      const from = next.indexOf(draggedId);
+      const to = next.indexOf(overId);
+      if (from === -1 || to === -1) return prev;
+      next.splice(from, 1);
+      next.splice(to, 0, draggedId);
+      return next;
+    });
+    setOrderDirty(true);
+  }
+  function handleDragEnd() {
+    setDraggedId(null);
+  }
+  function saveOrder() {
+    startTransition(async () => {
+      await reorderPlaces(order);
+      setOrderDirty(false);
+      router.refresh();
+    });
+  }
+  function cancelOrder() {
+    setOrder(rows.map((r) => r.id));
+    setOrderDirty(false);
+    setOrderMode(false);
+  }
 
   const allSelected =
     filteredRows.length > 0 && selected.size === filteredRows.length;
@@ -117,10 +173,61 @@ export function PlacesTable({
     });
   }
 
+  // Disable filter / search while in order mode to keep DnD coherent.
+  // We still render the controls, just dimmed and non-interactive.
+  const filtersLocked = orderMode;
+
   return (
     <>
+      {/* Order-mode bar */}
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+        <button
+          type="button"
+          onClick={() => setOrderMode((v) => !v)}
+          className={
+            orderMode
+              ? "inline-flex items-center gap-2 rounded-xl bg-peach-strong px-4 py-2 text-xs font-semibold text-white shadow-soft-md transition hover:-translate-y-0.5"
+              : "inline-flex items-center gap-2 rounded-xl border border-line-hover bg-card px-4 py-2 text-xs font-medium text-ink-muted transition hover:bg-surface hover:text-ink"
+          }
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="4" x2="20" y1="9" y2="9"/>
+            <line x1="4" x2="20" y1="15" y2="15"/>
+            <polyline points="10 5 14 9 10 13"/>
+            <polyline points="14 19 10 15 14 11"/>
+          </svg>
+          {orderMode ? "Řazení aktivní" : "Změnit pořadí"}
+        </button>
+        {orderMode ? (
+          <div className="flex gap-2">
+            {orderDirty ? (
+              <button
+                type="button"
+                onClick={saveOrder}
+                disabled={pending}
+                className="rounded-xl bg-gradient-to-r from-peach-strong to-rose-strong px-4 py-2 text-xs font-semibold text-white shadow-soft-md transition hover:-translate-y-0.5 disabled:opacity-60"
+              >
+                {pending ? "Ukládám…" : "Uložit pořadí"}
+              </button>
+            ) : null}
+            <button
+              type="button"
+              onClick={cancelOrder}
+              className="rounded-xl border border-line-hover bg-card px-4 py-2 text-xs font-medium text-ink-muted transition hover:bg-surface hover:text-ink"
+            >
+              {orderDirty ? "Zrušit" : "Zavřít"}
+            </button>
+          </div>
+        ) : null}
+      </div>
+
       {/* Filter + search bar */}
-      <div className="mb-4 space-y-3">
+      <div
+        className={
+          "mb-4 space-y-3 " +
+          (filtersLocked ? "pointer-events-none opacity-50" : "")
+        }
+      >
         <div className="relative">
           <svg
             width="16"
@@ -232,24 +339,46 @@ export function PlacesTable({
             ) : (
               filteredRows.map((p) => {
                 const editHref = `/admin/places/${p.id}/edit` as `/admin${string}`;
+                const isDragging = draggedId === p.id;
                 return (
                   <tr
                     key={p.id}
+                    draggable={dndActive}
+                    onDragStart={
+                      dndActive ? () => handleDragStart(p.id) : undefined
+                    }
+                    onDragOver={
+                      dndActive ? (e) => handleDragOver(e, p.id) : undefined
+                    }
+                    onDragEnd={dndActive ? handleDragEnd : undefined}
                     className={
                       "border-t border-line transition-colors " +
-                      (selected.has(p.id)
-                        ? "bg-peach/10"
-                        : "hover:bg-surface/50")
+                      (isDragging
+                        ? "opacity-40 bg-peach/20"
+                        : selected.has(p.id)
+                          ? "bg-peach/10"
+                          : "hover:bg-surface/50") +
+                      (dndActive ? " cursor-grab active:cursor-grabbing" : "")
                     }
                   >
                     <td className="px-3 py-4">
-                      <input
-                        type="checkbox"
-                        aria-label={`Vybrat ${p.name}`}
-                        checked={selected.has(p.id)}
-                        onChange={() => toggle(p.id)}
-                        className="h-4 w-4 cursor-pointer rounded border-line-hover text-peach-strong focus:ring-peach-strong/30"
-                      />
+                      {dndActive ? (
+                        <span
+                          aria-hidden
+                          title="Přetáhněte řádek pro změnu pořadí"
+                          className="text-ink-light"
+                        >
+                          ⋮⋮
+                        </span>
+                      ) : (
+                        <input
+                          type="checkbox"
+                          aria-label={`Vybrat ${p.name}`}
+                          checked={selected.has(p.id)}
+                          onChange={() => toggle(p.id)}
+                          className="h-4 w-4 cursor-pointer rounded border-line-hover text-peach-strong focus:ring-peach-strong/30"
+                        />
+                      )}
                     </td>
                     <td className="px-3 py-4">
                       <Link
