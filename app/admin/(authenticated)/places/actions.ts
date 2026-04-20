@@ -390,6 +390,47 @@ export async function deletePhotoAtSlot(placeId: string, sortOrder: number) {
   revalidatePath(`/admin/places/${placeId}/edit`);
 }
 
+export async function bulkDeletePlaces(
+  ids: string[],
+): Promise<{ deleted: number; error: string | null }> {
+  const profile = await requireEditor();
+  if (!Array.isArray(ids) || ids.length === 0)
+    return { deleted: 0, error: "Žádná místa nevybrána." };
+
+  const places = await prisma.place.findMany({
+    where: { id: { in: ids } },
+    include: { photos: true },
+  });
+
+  let deleted = 0;
+  for (const place of places) {
+    try {
+      for (const ph of place.photos) {
+        await deletePhotoByUrl(PLACE_PHOTOS_BUCKET, ph.url).catch(
+          () => undefined,
+        );
+      }
+      await prisma.place.delete({ where: { id: place.id } });
+      await prisma.auditLog.create({
+        data: {
+          actorId: profile.id,
+          action: "DELETE",
+          entityType: "Place",
+          entityId: place.id,
+          metadata: { name: place.name, slug: place.slug, bulk: true },
+        },
+      });
+      deleted++;
+    } catch (e) {
+      console.error("[bulkDeletePlaces] failed for", place.slug, e);
+    }
+  }
+
+  revalidatePath("/admin/places");
+  revalidatePath("/");
+  return { deleted, error: null };
+}
+
 export async function deletePlace(id: string) {
   const profile = await requireEditor();
   const place = await prisma.place.findUnique({

@@ -8,7 +8,11 @@ import {
   uploadPhoto,
 } from "@/lib/supabase/storage";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Resend is optional. The Suggestion is always persisted to DB; the e-mail
+// notification is only sent when RESEND_API_KEY is configured.
+const resend = process.env.RESEND_API_KEY
+  ? new Resend(process.env.RESEND_API_KEY)
+  : null;
 
 export type SuggestState = {
   success: boolean;
@@ -81,24 +85,30 @@ export async function submitSuggestion(
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://www.ostravuj.cz";
   const detailUrl = `${appUrl}/admin/suggestions/${suggestion.id}`;
 
-  try {
-    await resend.emails.send({
-      from: process.env.EMAIL_FROM ?? "Ostravuj <noreply@ostravuj.cz>",
-      to: adminEmail,
-      replyTo: contactEmail,
-      subject: `Nový návrh: ${placeName}`,
-      text: [
-        `Nový návrh místa od ${contactName}.`,
-        ``,
-        `Název: ${placeName}`,
-        `Kategorie: ${category}`,
-        ``,
-        `Detail v administraci: ${detailUrl}`,
-      ].join("\n"),
-    });
-  } catch (e) {
-    // Notification failure shouldn't block — suggestion is in DB
-    console.error("Suggestion notification e-mail failed:", e);
+  if (resend) {
+    try {
+      await resend.emails.send({
+        from: process.env.EMAIL_FROM ?? "Ostravuj <noreply@ostravuj.cz>",
+        to: adminEmail,
+        replyTo: contactEmail,
+        subject: `Nový návrh: ${placeName}`,
+        text: [
+          `Nový návrh místa od ${contactName}.`,
+          ``,
+          `Název: ${placeName}`,
+          `Kategorie: ${category}`,
+          ``,
+          `Detail v administraci: ${detailUrl}`,
+        ].join("\n"),
+      });
+    } catch (e) {
+      // Notification failure shouldn't block — suggestion is in DB
+      console.error("Suggestion notification e-mail failed:", e);
+    }
+  } else {
+    console.warn(
+      "[navrh-misto] RESEND_API_KEY not set — skipping notification e-mail.",
+    );
   }
 
   return { success: true, error: null };

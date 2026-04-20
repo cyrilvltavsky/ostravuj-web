@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useActionState, useState } from "react";
 import { submitSuggestion, type SuggestState } from "./action";
 
@@ -168,13 +169,25 @@ export function SuggestForm() {
         </div>
       </div>
 
-      <button
-        type="submit"
-        disabled={pending}
-        className="mt-3 inline-flex items-center gap-2.5 rounded-[14px] bg-gradient-to-r from-peach-strong to-rose-strong px-8 py-3.5 text-[15px] font-semibold text-white shadow-soft-md transition-all hover:-translate-y-0.5 hover:shadow-soft-lg disabled:pointer-events-none disabled:opacity-60"
-      >
-        {pending ? "Odesílám…" : "Odeslat návrh"}
-      </button>
+      <div className="mt-3 space-y-3">
+        <button
+          type="submit"
+          disabled={pending}
+          className="inline-flex items-center gap-2.5 rounded-[14px] bg-gradient-to-r from-peach-strong to-rose-strong px-8 py-3.5 text-[15px] font-semibold text-white shadow-soft-md transition-all hover:-translate-y-0.5 hover:shadow-soft-lg disabled:pointer-events-none disabled:opacity-60"
+        >
+          {pending ? "Odesílám…" : "Odeslat návrh"}
+        </button>
+        <p className="text-xs leading-relaxed text-ink-light">
+          Odesláním souhlasím se{" "}
+          <Link
+            href="/ochrana-osobnich-udaju"
+            className="text-ink-muted underline underline-offset-2 transition-colors hover:text-peach-strong"
+          >
+            zpracováním osobních údajů
+          </Link>
+          .
+        </p>
+      </div>
     </form>
   );
 }

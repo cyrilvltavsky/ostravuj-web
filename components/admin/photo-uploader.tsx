@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useState, useTransition } from "react";
 import { deletePhotoAtSlot } from "@/app/admin/(authenticated)/places/actions";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 import type { PlaceFormPhoto } from "./place-form";
 
 const SLOTS = 6; // 1 main + 5 extras
@@ -17,6 +18,7 @@ export function PhotoUploader({
   // Map sortOrder → existing url
   const existingMap = new Map(existing.map((p) => [p.sortOrder, p.url]));
   const [previews, setPreviews] = useState<Record<number, string | null>>({});
+  const [confirmSlot, setConfirmSlot] = useState<number | null>(null);
   const [pending, startTransition] = useTransition();
 
   function handleChange(slot: number, e: React.ChangeEvent<HTMLInputElement>) {
@@ -28,11 +30,17 @@ export function PhotoUploader({
     }
   }
 
-  function handleDelete(slot: number) {
+  function requestDelete(slot: number) {
     if (!placeId) return;
-    if (!confirm("Smazat fotku?")) return;
+    setConfirmSlot(slot);
+  }
+
+  function performDelete() {
+    if (confirmSlot === null || !placeId) return;
+    const slot = confirmSlot;
     startTransition(async () => {
       await deletePhotoAtSlot(placeId, slot);
+      setConfirmSlot(null);
     });
   }
 
@@ -96,7 +104,7 @@ export function PhotoUploader({
             {hasExisting && placeId ? (
               <button
                 type="button"
-                onClick={() => handleDelete(slot)}
+                onClick={() => requestDelete(slot)}
                 disabled={pending}
                 className="absolute right-2 top-2 rounded-full bg-white/95 p-1.5 text-rose-strong shadow-soft transition hover:bg-rose hover:text-white disabled:opacity-50"
                 aria-label="Smazat fotku"
@@ -120,6 +128,19 @@ export function PhotoUploader({
           </div>
         );
       })}
+      <ConfirmDialog
+        open={confirmSlot !== null}
+        title={
+          confirmSlot === 0
+            ? "Smazat hlavní fotku?"
+            : `Smazat fotku ${(confirmSlot ?? 0) + 1}?`
+        }
+        description="Soubor se odstraní z úložiště i z místa. Akce je nevratná."
+        confirmLabel="Ano, smazat"
+        pending={pending}
+        onConfirm={performDelete}
+        onCancel={() => setConfirmSlot(null)}
+      />
     </div>
   );
 }

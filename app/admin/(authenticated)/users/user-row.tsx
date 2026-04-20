@@ -1,7 +1,8 @@
 "use client";
 
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import type { Role } from "@prisma/client";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 import { changeRole, removeUser } from "./actions";
 
 export function UserRow({
@@ -20,20 +21,22 @@ export function UserRow({
   isMe: boolean;
 }) {
   const [pending, startTransition] = useTransition();
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   function handleRoleChange(e: React.ChangeEvent<HTMLSelectElement>) {
     const newRole = e.target.value as Role;
     startTransition(async () => {
       const res = await changeRole(userId, newRole);
-      if (res.error) alert(res.error);
+      if (res.error) setErrorMsg(res.error);
     });
   }
 
-  function handleRemove() {
-    if (!confirm(`Opravdu odebrat uživatele ${email}?`)) return;
+  function performRemove() {
     startTransition(async () => {
       const res = await removeUser(userId);
-      if (res.error) alert(res.error);
+      setConfirmOpen(false);
+      if (res.error) setErrorMsg(res.error);
     });
   }
 
@@ -72,13 +75,32 @@ export function UserRow({
         {!isMe ? (
           <button
             type="button"
-            onClick={handleRemove}
+            onClick={() => setConfirmOpen(true)}
             disabled={pending}
             className="rounded-xl border border-line-hover px-3 py-1.5 text-xs font-medium text-rose-strong transition hover:bg-rose/30"
           >
             Odebrat
           </button>
         ) : null}
+        <ConfirmDialog
+          open={confirmOpen}
+          title={`Odebrat uživatele ${email}?`}
+          description="Uživatel ztratí přístup do administrace. Účet zmizí ze Supabase Auth i z tabulky profiles."
+          confirmLabel="Ano, odebrat"
+          pending={pending}
+          onConfirm={performRemove}
+          onCancel={() => setConfirmOpen(false)}
+        />
+        <ConfirmDialog
+          open={errorMsg !== null}
+          title="Chyba"
+          description={errorMsg}
+          confirmLabel="Rozumím"
+          cancelLabel="Zavřít"
+          destructive={false}
+          onConfirm={() => setErrorMsg(null)}
+          onCancel={() => setErrorMsg(null)}
+        />
       </td>
     </tr>
   );
