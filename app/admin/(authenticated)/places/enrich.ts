@@ -1,8 +1,20 @@
 "use server";
 
+import { createOpenAI } from "@ai-sdk/openai";
 import { generateText, Output } from "ai";
 import { z } from "zod";
 import { requireEditor } from "@/lib/auth";
+
+/**
+ * OpenAI provider routed through Vercel AI Gateway. We use the Responses
+ * API (`openai.responses(...)`) because it supports the web_search_preview
+ * tool — that's what lets the model fetch current info about Ostrava
+ * places instead of relying solely on training data.
+ */
+const aiOpenAI = createOpenAI({
+  apiKey: process.env.AI_GATEWAY_API_KEY,
+  baseURL: "https://ai-gateway.vercel.sh/v1/openai",
+});
 
 export type EnrichField =
   | "address"
@@ -131,21 +143,48 @@ export async function enrichFields(input: {
   const prompt = ctxParts.join(" ");
 
   const systemPrompt = [
-    "Jsi pomocnik pro ostravsky katalog mist. Vyplnujes strukturovane udaje o realnych ostravskych podnicich.",
-    "DULEZITA pravidla:",
-    "- Pokud si nejsi JIST konkretni informaci, vrat null (nebo prazdne pole pro tagy). NIKDY si nevymyslej.",
-    "- Adresy musi byt realne ostravske adresy. Pokud misto neznas, vrat null pro vsechna pole.",
-    "- Kontaktni udaje (telefon, e-mail, web, IG, FB) doplnuj jen pokud mas spolehlivou znalost.",
-    "- Krátké popisy piste prirozenou cestinou s diakritikou, BEZ marketingovych klise (nejlepsi, uzasny, famozni...).",
-    "- Stitky volte kratke (1-2 slova) zamerene na atmosferu, kuchyni, vlastnosti.",
-    "- VSECHNY TEXTY V CESTINE s plnou diakritikou.",
+    "Jsi expert na podniky a mista v OSTRAVE a OKOLI Ostravy (Moravskoslezsky kraj — Ostrava, Frydek-Mistek, Karvina, Havirov, Bohumin, Hlucin, Petrkovice, Vitkovice, Poruba, Slezska Ostrava, Moravska Ostrava, Marianske Hory atd.).",
+    "",
+    "GEOGRAFICKE OMEZENI — KRITICKE:",
+    "- Tento katalog je VYHRADNE pro mista v Ostrave a jejim okoli (Moravskoslezsky kraj).",
+    "- Pokud podnik existuje ve vice mestech (retezce, franchisy), zamer se VYHRADNE na ostravskou pobocku.",
+    "- Pokud je podnik mimo Ostravu/Moravskoslezsky kraj (Praha, Brno, Olomouc...), VRAT NULL pro vsechna pole. Tento katalog ho nepokryva.",
+    "- Pri pochybnostech, jestli existuje v Ostrave, vrat null spise nez si vymyslej.",
+    "",
+    "PRISTUP k jednotlivym polim:",
+    "",
+    "ADRESA, CTVRT — POUZE pokud mas spolehlivou znalost ostravske adresy (s PSC zacinajicim 70x, 71x, 72x, 73x, 74x). Jinak null.",
+    "",
+    "TELEFON, E-MAIL, WEB, INSTAGRAM, FACEBOOK — POUZE pokud si jist a jde o ostravskou pobocku. Jinak null.",
+    "",
+    "KRATKY POPIS (shortDesc) — VYPLNTE skoro vzdy pokud znate alespon kategorii a podnik je v Ostrave:",
+    "- Znate podnik konkretne -> popiste atmosferu, specialitu, co tam najit.",
+    "- Znate jen typ (napr. 'kavarna v Ostrave') -> napsete genericky popis pro tento typ ostravskeho podniku.",
+    "- Popis 2-3 vety, prirozena cestina s diakritikou, BEZ klise (nejlepsi, uzasny, famozni).",
+    "",
+    "STITKY (tags) — vyplnte alespon 2-3 stitky podle typu podniku (restaurace -> 'restaurace', 'obed', 'vecere'; kavarna -> 'kavarna', 'kava', 'snidane'). Pokud znate atmosferu, pridejte ('zahradka', 'rodine', 'klidne', 'pet-friendly').",
+    "",
+    "PRAVIDLO: Nedavejte null pro VSECHNA pole jen proto, ze nezname jednu vec. Vyplnte co MUZETE (popis, stitky podle kategorie), zbytek nechte null.",
+    "",
+    "VSECHNY TEXTY V CESTINE s plnou diakritikou.",
   ].join("\n");
 
   try {
     const result = await generateText({
-      model: "openai/gpt-5.4",
+      model: aiOpenAI.responses("gpt-5"),
       system: systemPrompt,
       prompt,
+      tools: {
+        web_search_preview: aiOpenAI.tools.webSearchPreview({
+          searchContextSize: "medium",
+          userLocation: {
+            type: "approximate",
+            country: "CZ",
+            region: "Moravskoslezsky kraj",
+            city: "Ostrava",
+          },
+        }),
+      },
       output: Output.object({ schema }),
     });
 
@@ -154,6 +193,26 @@ export async function enrichFields(input: {
   } catch (e) {
     console.error("[enrichFields]", e);
     const msg = e instanceof Error ? e.message : "Neznama chyba.";
+    // Fallback to plain gateway model without web search if Responses API
+    // path fails (e.g. tool not enabled for this account)
+    if (
+      msg.includes("web_search") ||
+      msg.includes("responses") ||
+      msg.includes("not supported")
+    ) {
+      try {
+        const fallback = await generateText({
+          model: "openai/gpt-5.4",
+          system: systemPrompt,
+          prompt,
+          output: Output.object({ schema }),
+        });
+        return { ok: true, error: null, data: fallback.output as EnrichData };
+      } catch (e2) {
+        const msg2 = e2 instanceof Error ? e2.message : "Neznama chyba.";
+        return { ok: false, error: `AI volani selhalo: ${msg2}` };
+      }
+    }
     return { ok: false, error: `AI volani selhalo: ${msg}` };
   }
 }
