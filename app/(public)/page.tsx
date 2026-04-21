@@ -6,7 +6,7 @@ import { BigRandomButton, HeroRandomButton } from "@/components/random-picker";
 import {
   getAllCategories,
   getCategoryCounts,
-  getFeaturedPlaces,
+  getFeaturedPlacesPage,
   getSubcategoriesInCategory,
   getTotalPlaceCount,
 } from "@/lib/queries/places";
@@ -14,13 +14,25 @@ import { SUBCATEGORY_LABELS, type SubcategorySlug } from "@/lib/places";
 
 export const revalidate = 60;
 
-export default async function HomePage() {
-  const [categories, counts, featured, total] = await Promise.all([
+const FEATURED_PAGE_SIZE = 12;
+
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
+  const sp = await searchParams;
+  const pageRaw = Number(sp.page ?? "1");
+  const page =
+    Number.isFinite(pageRaw) && pageRaw >= 1 ? Math.floor(pageRaw) : 1;
+
+  const [categories, counts, featuredPage, total] = await Promise.all([
     getAllCategories(),
     getCategoryCounts(),
-    getFeaturedPlaces(),
+    getFeaturedPlacesPage(page, FEATURED_PAGE_SIZE),
     getTotalPlaceCount(),
   ]);
+  const featured = featuredPage.items;
   const subsByCategory = await Promise.all(
     categories.map((c) => getSubcategoriesInCategory(c.slug)),
   );
@@ -126,6 +138,37 @@ export default async function HomePage() {
               </AnimateOnScroll>
             ))}
           </div>
+
+          {/* Pagination */}
+          {featuredPage.pageCount > 1 ? (
+            <nav
+              aria-label="Stránkování doporučených míst"
+              className="mt-10 flex items-center justify-center gap-2"
+            >
+              {page > 1 ? (
+                <Link
+                  href={page === 2 ? "/" : `/?page=${page - 1}`}
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-line-hover bg-card px-4 py-2 text-sm font-medium text-ink-muted transition hover:bg-surface hover:text-ink"
+                  scroll
+                >
+                  ← Předchozí
+                </Link>
+              ) : null}
+              <span className="px-3 text-sm font-medium text-ink-muted">
+                Strana <strong className="text-ink">{page}</strong> z{" "}
+                {featuredPage.pageCount}
+              </span>
+              {page < featuredPage.pageCount ? (
+                <Link
+                  href={`/?page=${page + 1}`}
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-line-hover bg-card px-4 py-2 text-sm font-medium text-ink-muted transition hover:bg-surface hover:text-ink"
+                  scroll
+                >
+                  Další →
+                </Link>
+              ) : null}
+            </nav>
+          ) : null}
         </div>
       </section>
 

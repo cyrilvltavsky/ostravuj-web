@@ -5,6 +5,7 @@ import { useActionState, useState } from "react";
 import { EnrichFieldButton, EnrichSectionButton } from "./enrich";
 import { PhotoUploader } from "./photo-uploader";
 import type { PlaceFormState } from "@/app/admin/(authenticated)/places/actions";
+import { OSTRAVA_DISTRICTS } from "@/lib/places";
 
 const initial: PlaceFormState = { error: null };
 
@@ -277,13 +278,7 @@ export function PlaceForm({
             label="Čtvrť"
             actions={<EnrichFieldButton field="district" />}
           >
-            <input
-              type="text"
-              name="district"
-              defaultValue={defaults.district ?? ""}
-              className={inputClass}
-              placeholder="Moravská Ostrava"
-            />
+            <DistrictChips defaultValue={defaults.district ?? ""} />
           </Field>
         </div>
         <Field
@@ -574,5 +569,90 @@ function Toggle({
       />
       {label}
     </label>
+  );
+}
+
+/**
+ * District selector — chip per Ostrava obvod, single-select.
+ * Pre-selects from defaultValue. If defaultValue isn't in the known
+ * list, exposes a "Vlastní" text input pre-filled with that value
+ * so legacy/custom districts still work.
+ */
+function DistrictChips({ defaultValue }: { defaultValue: string }) {
+  const isKnown = OSTRAVA_DISTRICTS.includes(defaultValue);
+  const [selected, setSelected] = useState<string>(defaultValue);
+  const [showCustom, setShowCustom] = useState<boolean>(
+    !isKnown && defaultValue !== "",
+  );
+
+  function pick(name: string) {
+    setSelected(name);
+    setShowCustom(false);
+  }
+
+  function clear() {
+    setSelected("");
+    setShowCustom(false);
+  }
+
+  return (
+    <div>
+      {/* Hidden form value sent to the server */}
+      <input type="hidden" name="district" value={selected} />
+
+      <div className="flex flex-wrap gap-1.5">
+        {OSTRAVA_DISTRICTS.map((d) => {
+          const active = selected === d;
+          return (
+            <button
+              key={d}
+              type="button"
+              onClick={() => pick(d)}
+              className={
+                active
+                  ? "rounded-full bg-gradient-to-r from-peach-strong to-rose-strong px-3 py-1.5 text-xs font-semibold text-white shadow-soft"
+                  : "rounded-full border border-line-hover bg-card px-3 py-1.5 text-xs font-medium text-ink-muted transition hover:bg-surface hover:text-ink"
+              }
+            >
+              {d}
+            </button>
+          );
+        })}
+        <button
+          type="button"
+          onClick={() => {
+            setShowCustom((v) => !v);
+            if (!showCustom) setSelected("");
+          }}
+          className={
+            showCustom
+              ? "rounded-full bg-ink px-3 py-1.5 text-xs font-semibold text-white"
+              : "rounded-full border border-dashed border-line-hover bg-card px-3 py-1.5 text-xs font-medium text-ink-muted transition hover:bg-surface hover:text-ink"
+          }
+        >
+          + Vlastní
+        </button>
+        {selected || showCustom ? (
+          <button
+            type="button"
+            onClick={clear}
+            aria-label="Zrušit výběr"
+            className="rounded-full border border-line-hover bg-card px-2.5 py-1.5 text-xs text-ink-light transition hover:bg-surface hover:text-rose-strong"
+          >
+            ✕
+          </button>
+        ) : null}
+      </div>
+
+      {showCustom ? (
+        <input
+          type="text"
+          value={selected}
+          onChange={(e) => setSelected(e.target.value)}
+          placeholder="Napište vlastní označení čtvrti"
+          className="mt-2 w-full rounded-xl border border-line bg-card px-4 py-2.5 text-[15px] text-ink shadow-soft outline-none placeholder:text-ink-light focus:border-peach-strong focus:ring-1 focus:ring-peach-strong/30"
+        />
+      ) : null}
+    </div>
   );
 }

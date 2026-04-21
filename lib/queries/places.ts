@@ -136,6 +136,41 @@ export async function getFeaturedPlaces(): Promise<Place[]> {
   );
 }
 
+/**
+ * Paginated featured places — used on the homepage.
+ * Returns up to `pageSize` items at the given 1-based page index,
+ * plus the total count for pagination UI.
+ */
+export async function getFeaturedPlacesPage(
+  page: number,
+  pageSize: number,
+): Promise<{ items: Place[]; total: number; pageCount: number }> {
+  const skip = Math.max(0, (page - 1) * pageSize);
+  const [rows, total] = await Promise.all([
+    prisma.place.findMany({
+      where: { status: "PUBLISHED", featured: true },
+      include: {
+        category: true,
+        photos: { orderBy: { sortOrder: "asc" }, take: 1 },
+        discountCode: true,
+      },
+      orderBy: [{ sortOrder: "desc" }, { createdAt: "asc" }],
+      skip,
+      take: pageSize,
+    }),
+    prisma.place.count({
+      where: { status: "PUBLISHED", featured: true },
+    }),
+  ]);
+  return {
+    items: rows.map((r) =>
+      toPlaceView(r as unknown as NonNullable<PlaceWithRelations>),
+    ),
+    total,
+    pageCount: Math.max(1, Math.ceil(total / pageSize)),
+  };
+}
+
 export async function getCategoryCounts(): Promise<Record<string, number>> {
   // Count places per category by primary categoryId AND by membership in
   // categorySlugs (a place tagged in multiple categories shows up in

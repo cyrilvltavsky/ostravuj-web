@@ -55,6 +55,40 @@ export type CategoryMeta = {
   image: string;
 };
 
+/**
+ * Ostravské městské obvody seřazené podle významu (centra města + největší
+ * obytné čtvrti nahoře, menší okrajové dolů). Slouží jako chip-selector
+ * v adminu — uživatel klikne místo psaní.
+ */
+export const OSTRAVA_DISTRICTS: readonly string[] = [
+  "Moravská Ostrava",
+  "Slezská Ostrava",
+  "Poruba",
+  "Mariánské Hory",
+  "Vítkovice",
+  "Ostrava-Jih",
+  "Hrabová",
+  "Radvanice a Bartovice",
+  "Svinov",
+  "Michálkovice",
+  "Stará Bělá",
+  "Nová Bělá",
+  "Petřkovice",
+  "Krásné Pole",
+  "Polanka nad Odrou",
+  "Třebovice",
+  "Hošťálkovice",
+  "Lhotka",
+  "Martinov",
+  "Plesná",
+  "Pustkovec",
+  "Nová Ves",
+  "Proskovice",
+  "Muglinov",
+  "Přívoz",
+  "Hulváky",
+];
+
 export const SUBCATEGORY_LABELS: Record<SubcategorySlug, string> = {
   restaurace: "Restaurace",
   bistro: "Bistro",

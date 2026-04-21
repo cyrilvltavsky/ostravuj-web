@@ -13,6 +13,7 @@ type NavItem = {
 
 const NAV: NavItem[] = [
   { href: "/admin", label: "Přehled" },
+  { href: "/admin/homepage", label: "Homepage" },
   { href: "/admin/places", label: "Místa" },
   { href: "/admin/categories", label: "Kategorie", superAdminOnly: true },
   { href: "/admin/suggestions", label: "Návrhy" },
