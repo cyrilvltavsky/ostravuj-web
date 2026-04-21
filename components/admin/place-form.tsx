@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useActionState, useState } from "react";
+import { EnrichButton } from "./enrich-button";
 import { PhotoUploader } from "./photo-uploader";
 import type { PlaceFormState } from "@/app/admin/(authenticated)/places/actions";
 
@@ -142,6 +143,8 @@ export function PlaceForm({
           Uloženo ✓
         </div>
       ) : null}
+
+      <EnrichButton />
 
       <Section title="Základní údaje">
         <div className="grid gap-4 sm:grid-cols-2">
