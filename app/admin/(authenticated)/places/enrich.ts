@@ -169,14 +169,96 @@ export async function enrichFields(input: {
     "VSECHNY TEXTY V CESTINE s plnou diakritikou.",
   ].join("\n");
 
+  // 2-step pipeline:
+  // 1) Perplexity Sonar — web-grounded research (returns raw paragraph
+  //    of facts with citations from Google, Firmy.cz, official site)
+  // 2) GPT-5 — structures the raw text into our Zod schema
+  // This gives much better recall than relying on a single model with
+  // an attached web_search tool.
   try {
-    const result = await generateText({
+    const research = await researchOnWeb({ prompt, name, category: input.category });
+    if (!research) {
+      return { ok: false, error: "Web hledani nevratilo zadne informace." };
+    }
+
+    const structured = await generateText({
+      model: "openai/gpt-5.4",
+      system: [
+        systemPrompt,
+        "",
+        "INSTRUKCE PRO TENTO KROK:",
+        "Mas k dispozici raw text z web hledani (nize). Z neho vytahni strukturovana data.",
+        "Pokud raw text obsahuje udaj, vyplnte ho. Pokud raw text udaj neobsahuje, vrat null.",
+        "DULEZITE: Spolehnete se na raw text — neomezujte se na svou trenovaci databazi.",
+      ].join("\n"),
+      prompt: `${prompt}\n\nRAW WEB DATA:\n${research}`,
+      output: Output.object({ schema }),
+    });
+
+    return { ok: true, error: null, data: structured.output as EnrichData };
+  } catch (e) {
+    console.error("[enrichFields]", e);
+    const msg = e instanceof Error ? e.message : "Neznama chyba.";
+    return { ok: false, error: `AI volani selhalo: ${msg}` };
+  }
+}
+
+/**
+ * Step 1 of the enrich pipeline — call a web-grounded model that
+ * actually searches the live web. Tries Perplexity Sonar first
+ * (purpose-built for this), falls back to OpenAI Responses API with
+ * web_search_preview tool.
+ */
+async function researchOnWeb(input: {
+  prompt: string;
+  name: string;
+  category?: string | null;
+}): Promise<string | null> {
+  const researchPrompt = [
+    `Zjisti vsechny dostupne informace o tomto OSTRAVSKEM podniku:`,
+    ``,
+    `Nazev: "${input.name}"`,
+    input.category ? `Kategorie: ${input.category}` : null,
+    `Mesto: Ostrava (Moravskoslezsky kraj, Ceska republika)`,
+    ``,
+    `Hledej na: Google Maps, Firmy.cz, oficialni web podniku, Instagram, Facebook.`,
+    ``,
+    `Vrat strukturovany prehled (1 odstavec na typ informace):`,
+    `- ADRESA (plna adresa s PSC zacinajicim 70x/71x/72x/73x/74x)`,
+    `- CTVRT (Moravska Ostrava / Poruba / Slezska Ostrava / Vitkovice / atd.)`,
+    `- TELEFON (+420 ...)`,
+    `- E-MAIL`,
+    `- WEB (URL)`,
+    `- INSTAGRAM (handle)`,
+    `- FACEBOOK (handle nebo URL)`,
+    `- POPIS (atmosfera, kuchyne / nabidka, cim je podnik specificky — 2-3 vety v cestine)`,
+    `- STITKY (3-6 klicovych slov v cestine: typ kuchyne, atmosfera, vlastnosti)`,
+    ``,
+    `Pokud podnik neexistuje v Ostrave nebo nemuzes overit ze je v Ostrave, napis to v odpovedi.`,
+    `Pokud konkretni informaci nenajdes, napis "neznama".`,
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  // Try Perplexity Sonar via AI Gateway (web-grounded by design)
+  try {
+    const sonar = await generateText({
+      model: "perplexity/sonar",
+      prompt: researchPrompt,
+    });
+    if (sonar.text && sonar.text.trim().length > 50) return sonar.text;
+  } catch (e) {
+    console.warn("[researchOnWeb] perplexity/sonar failed:", e);
+  }
+
+  // Fallback to OpenAI Responses API + web_search_preview
+  try {
+    const oa = await generateText({
       model: aiOpenAI.responses("gpt-5"),
-      system: systemPrompt,
-      prompt,
+      prompt: researchPrompt,
       tools: {
         web_search_preview: aiOpenAI.tools.webSearchPreview({
-          searchContextSize: "medium",
+          searchContextSize: "high",
           userLocation: {
             type: "approximate",
             country: "CZ",
@@ -185,34 +267,11 @@ export async function enrichFields(input: {
           },
         }),
       },
-      output: Output.object({ schema }),
     });
-
-    const out = result.output as EnrichData;
-    return { ok: true, error: null, data: out };
+    if (oa.text && oa.text.trim().length > 50) return oa.text;
   } catch (e) {
-    console.error("[enrichFields]", e);
-    const msg = e instanceof Error ? e.message : "Neznama chyba.";
-    // Fallback to plain gateway model without web search if Responses API
-    // path fails (e.g. tool not enabled for this account)
-    if (
-      msg.includes("web_search") ||
-      msg.includes("responses") ||
-      msg.includes("not supported")
-    ) {
-      try {
-        const fallback = await generateText({
-          model: "openai/gpt-5.4",
-          system: systemPrompt,
-          prompt,
-          output: Output.object({ schema }),
-        });
-        return { ok: true, error: null, data: fallback.output as EnrichData };
-      } catch (e2) {
-        const msg2 = e2 instanceof Error ? e2.message : "Neznama chyba.";
-        return { ok: false, error: `AI volani selhalo: ${msg2}` };
-      }
-    }
-    return { ok: false, error: `AI volani selhalo: ${msg}` };
+    console.warn("[researchOnWeb] openai responses failed:", e);
   }
+
+  return null;
 }
