@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useActionState, useState } from "react";
-import { EnrichButton } from "./enrich-button";
+import { EnrichFieldButton, EnrichSectionButton } from "./enrich";
 import { PhotoUploader } from "./photo-uploader";
 import type { PlaceFormState } from "@/app/admin/(authenticated)/places/actions";
 
@@ -133,7 +133,11 @@ export function PlaceForm({
       : undefined;
 
   return (
-    <form action={formAction} className="space-y-6 pb-12">
+    <form
+      action={formAction}
+      data-place-form
+      className="space-y-6 pb-12"
+    >
       {state.error ? (
         <div className="rounded-xl border border-rose-strong/20 bg-rose/30 px-4 py-3 text-sm font-medium text-rose-strong">
           {state.error}
@@ -143,8 +147,6 @@ export function PlaceForm({
           Uloženo ✓
         </div>
       ) : null}
-
-      <EnrichButton />
 
       <Section title="Základní údaje">
         <div className="grid gap-4 sm:grid-cols-2">
@@ -248,9 +250,20 @@ export function PlaceForm({
         <PhotoUploader existing={defaults.photos ?? []} placeId={placeId} />
       </Section>
 
-      <Section title="Adresa a popis">
+      <Section
+        title="Adresa a popis"
+        actions={
+          <EnrichSectionButton
+            fields={["address", "district", "shortDesc", "tags"]}
+          />
+        }
+      >
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Adresa" required>
+          <Field
+            label="Adresa"
+            required
+            actions={<EnrichFieldButton field="address" />}
+          >
             <input
               type="text"
               name="address"
@@ -260,7 +273,10 @@ export function PlaceForm({
               placeholder="Pivovarská 1, 702 00 Moravská Ostrava"
             />
           </Field>
-          <Field label="Čtvrť">
+          <Field
+            label="Čtvrť"
+            actions={<EnrichFieldButton field="district" />}
+          >
             <input
               type="text"
               name="district"
@@ -273,6 +289,7 @@ export function PlaceForm({
         <Field
           label="Krátký popis"
           hint="Zobrazí se v kartě i detailu (volitelné — můžeš doplnit později)"
+          actions={<EnrichFieldButton field="shortDesc" />}
         >
           <textarea
             name="shortDesc"
@@ -285,6 +302,7 @@ export function PlaceForm({
         <Field
           label="Tagy"
           hint="Oddělené čárkami, např. lokální suroviny, zahrádka, brunch"
+          actions={<EnrichFieldButton field="tags" />}
         >
           <input
             type="text"
@@ -299,9 +317,14 @@ export function PlaceForm({
       <Section
         title="Kontakty"
         hint="Volitelné — URL adresy lze zadat i bez https://"
+        actions={
+          <EnrichSectionButton
+            fields={["phone", "email", "website", "instagram", "facebook"]}
+          />
+        }
       >
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Telefon">
+          <Field label="Telefon" actions={<EnrichFieldButton field="phone" />}>
             <input
               type="tel"
               name="phone"
@@ -310,7 +333,7 @@ export function PlaceForm({
               placeholder="+420 737 370 572"
             />
           </Field>
-          <Field label="E-mail">
+          <Field label="E-mail" actions={<EnrichFieldButton field="email" />}>
             <input
               type="email"
               name="email"
@@ -319,7 +342,11 @@ export function PlaceForm({
               placeholder="info@misto.cz"
             />
           </Field>
-          <Field label="Web" hint="Stačí www.misto.cz — https:// se doplní">
+          <Field
+            label="Web"
+            hint="Stačí www.misto.cz — https:// se doplní"
+            actions={<EnrichFieldButton field="website" />}
+          >
             <input
               type="text"
               name="website"
@@ -328,7 +355,11 @@ export function PlaceForm({
               placeholder="www.misto.cz"
             />
           </Field>
-          <Field label="Instagram" hint="Handle nebo URL">
+          <Field
+            label="Instagram"
+            hint="Handle nebo URL"
+            actions={<EnrichFieldButton field="instagram" />}
+          >
             <input
               type="text"
               name="instagram"
@@ -337,7 +368,11 @@ export function PlaceForm({
               placeholder="@misto_oficialni"
             />
           </Field>
-          <Field label="Facebook" hint="Stránka nebo URL">
+          <Field
+            label="Facebook"
+            hint="Stránka nebo URL"
+            actions={<EnrichFieldButton field="facebook" />}
+          >
             <input
               type="text"
               name="facebook"
@@ -440,15 +475,20 @@ export function PlaceForm({
 function Section({
   title,
   hint,
+  actions,
   children,
 }: {
   title: string;
   hint?: string;
+  actions?: React.ReactNode;
   children: React.ReactNode;
 }) {
   return (
     <section className="rounded-card-lg border border-line bg-card p-6 shadow-soft">
-      <h2 className="text-base font-bold text-ink">{title}</h2>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <h2 className="text-base font-bold text-ink">{title}</h2>
+        {actions ? <div className="shrink-0">{actions}</div> : null}
+      </div>
       {hint ? (
         <p className="mb-4 mt-1 text-sm text-ink-muted">{hint}</p>
       ) : (
@@ -463,11 +503,13 @@ function Field({
   label,
   required,
   hint,
+  actions,
   children,
 }: {
   label: string;
   required?: boolean;
   hint?: string;
+  actions?: React.ReactNode;
   children: React.ReactNode;
 }) {
   return (
@@ -476,7 +518,10 @@ function Field({
         {label}
         {required ? <span className="text-peach-strong"> *</span> : null}
       </label>
-      {children}
+      <div className="flex items-start gap-1">
+        <div className="min-w-0 flex-1">{children}</div>
+        {actions ? <div className="shrink-0 pt-0.5">{actions}</div> : null}
+      </div>
       {hint ? <p className="mt-1 text-xs text-ink-light">{hint}</p> : null}
     </div>
   );
