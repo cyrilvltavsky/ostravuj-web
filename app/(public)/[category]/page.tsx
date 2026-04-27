@@ -1,21 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { FilterChips } from "@/components/filter-chips";
+import { PlaceCard } from "@/components/place-card";
 import {
   getAllCategories,
   getPlacesByCategory,
-  getSubcategoriesInCategory,
 } from "@/lib/queries/places";
-import type { CategorySlug, SubcategorySlug } from "@/lib/places";
+import type { CategorySlug } from "@/lib/places";
 
 type Params = { category: string };
-
-const KNOWN_SLUGS: CategorySlug[] = ["gastro", "aktivity", "rande", "zdarma"];
-
-function isCategorySlug(s: string): s is CategorySlug {
-  return (KNOWN_SLUGS as string[]).includes(s);
-}
 
 export const revalidate = 60;
 
@@ -45,12 +38,10 @@ export default async function CategoryPage({
   params: Promise<Params>;
 }) {
   const { category } = await params;
-  if (!isCategorySlug(category)) notFound();
 
-  const [cats, places, subs] = await Promise.all([
+  const [cats, places] = await Promise.all([
     getAllCategories(),
-    getPlacesByCategory(category),
-    getSubcategoriesInCategory(category),
+    getPlacesByCategory(category as CategorySlug),
   ]);
   const meta = cats.find((c) => c.slug === category);
   if (!meta) notFound();
@@ -82,10 +73,17 @@ export default async function CategoryPage({
 
       <section className="pb-20">
         <div className="container-page">
-          <FilterChips
-            places={places}
-            subcategories={subs as SubcategorySlug[]}
-          />
+          {places.length === 0 ? (
+            <p className="py-16 text-center text-ink-muted">
+              Zatím žádná místa v této kategorii.
+            </p>
+          ) : (
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {places.map((place) => (
+                <PlaceCard key={place.slug} place={place} />
+              ))}
+            </div>
+          )}
         </div>
       </section>
     </>

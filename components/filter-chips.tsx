@@ -17,7 +17,13 @@ export function FilterChips({ places, subcategories }: FilterChipsProps) {
   const [filter, setFilter] = useState<SubcategorySlug | "all">("all");
 
   const filtered =
-    filter === "all" ? places : places.filter((p) => p.subcategory === filter);
+    filter === "all"
+      ? places
+      : places.filter((p) =>
+          p.subcategories.length > 0
+            ? p.subcategories.includes(filter)
+            : p.subcategory === filter,
+        );
 
   const chipClass = (active: boolean) =>
     `rounded-full px-4 py-2 text-sm font-medium transition-colors ${

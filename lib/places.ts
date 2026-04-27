@@ -33,6 +33,7 @@ export type Place = {
   name: string;
   category: CategorySlug;
   subcategory: SubcategorySlug;
+  subcategories: string[];
   tags: string[];
   address: string;
   district: string;

@@ -25,6 +25,13 @@ function toPlaceView(p: NonNullable<PlaceWithRelations>): Place {
   const mainPhoto = p.photos[0]?.url ?? "";
   // Prefer the multi-value subcategories array; fall back to legacy field
   const firstSub = p.subcategories[0] ?? p.subcategory ?? "restaurace";
+  // Full list for multi-subcategory filtering on the frontend
+  const allSubs =
+    p.subcategories.length > 0
+      ? p.subcategories
+      : p.subcategory
+        ? [p.subcategory]
+        : [];
 
   return {
     id: 0,
@@ -32,6 +39,7 @@ function toPlaceView(p: NonNullable<PlaceWithRelations>): Place {
     name: p.name,
     category: p.category.slug as CategorySlug,
     subcategory: firstSub as Place["subcategory"],
+    subcategories: allSubs,
     tags: p.tags,
     address: p.address,
     district: p.district ?? "",
@@ -99,15 +107,12 @@ export async function getPlacePhotos(slug: string): Promise<string[]> {
 export async function getPlacesByCategory(
   categorySlug: CategorySlug,
 ): Promise<Place[]> {
-  // Match on the multi-value categorySlugs array (includes the primary
-  // category) so a place can show up in multiple listings.
+  // Only match on the primary category — secondary tags in `categorySlugs`
+  // are no longer used for listing.
   const rows = await prisma.place.findMany({
     where: {
       status: "PUBLISHED",
-      OR: [
-        { categorySlugs: { has: categorySlug } },
-        { category: { slug: categorySlug } },
-      ],
+      category: { slug: categorySlug },
     },
     include: {
       category: true,
@@ -172,9 +177,7 @@ export async function getFeaturedPlacesPage(
 }
 
 export async function getCategoryCounts(): Promise<Record<string, number>> {
-  // Count places per category by primary categoryId AND by membership in
-  // categorySlugs (a place tagged in multiple categories shows up in
-  // each one's count).
+  // Count places per category by primary categoryId only.
   const cats = await prisma.category.findMany({
     select: { id: true, slug: true },
   });
@@ -183,7 +186,7 @@ export async function getCategoryCounts(): Promise<Record<string, number>> {
     out[c.slug] = await prisma.place.count({
       where: {
         status: "PUBLISHED",
-        OR: [{ categoryId: c.id }, { categorySlugs: { has: c.slug } }],
+        categoryId: c.id,
       },
     });
   }
@@ -200,17 +203,18 @@ export async function getSubcategoriesInCategory(
   const rows = await prisma.place.findMany({
     where: {
       status: "PUBLISHED",
-      OR: [
-        { categorySlugs: { has: categorySlug } },
-        { category: { slug: categorySlug } },
-      ],
+      category: { slug: categorySlug },
     },
     select: { subcategory: true, subcategories: true },
   });
   const all = new Set<string>();
   for (const r of rows) {
-    for (const s of r.subcategories) all.add(s);
-    if (r.subcategory) all.add(r.subcategory);
+    for (const s of r.subcategories) {
+      const trimmed = s.trim();
+      if (trimmed) all.add(trimmed);
+    }
+    const single = r.subcategory?.trim();
+    if (single) all.add(single);
   }
   return [...all];
 }

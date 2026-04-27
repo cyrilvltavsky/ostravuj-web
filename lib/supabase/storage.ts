@@ -5,7 +5,7 @@ export const PLACE_PHOTOS_BUCKET = "place-photos";
 export const SUGGESTION_PHOTOS_BUCKET = "suggestion-photos";
 
 const ALLOWED_MIME = ["image/jpeg", "image/png", "image/webp"];
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+const MAX_FILE_SIZE = 30 * 1024 * 1024; // 30 MB
 
 function safeFileName(name: string): string {
   return name
@@ -26,7 +26,7 @@ export async function uploadPhoto(
     throw new Error(`Nepodporovaný formát: ${file.type}`);
   }
   if (file.size > MAX_FILE_SIZE) {
-    throw new Error("Soubor je větší než 5 MB.");
+    throw new Error("Soubor je větší než 30 MB.");
   }
 
   const supabase = createAdminClient();
@@ -69,8 +69,24 @@ export async function deletePhotoByUrl(
 export async function ensurePlacePhotosBucket(): Promise<void> {
   const supabase = createAdminClient();
   const { data: buckets } = await supabase.storage.listBuckets();
-  const exists = buckets?.some((b) => b.name === PLACE_PHOTOS_BUCKET);
-  if (exists) return;
+  const existing = buckets?.find((b) => b.name === PLACE_PHOTOS_BUCKET);
+
+  if (existing) {
+    if (existing.file_size_limit !== MAX_FILE_SIZE) {
+      const { error } = await supabase.storage.updateBucket(
+        PLACE_PHOTOS_BUCKET,
+        {
+          public: true,
+          fileSizeLimit: MAX_FILE_SIZE,
+          allowedMimeTypes: ALLOWED_MIME,
+        },
+      );
+      if (error) {
+        throw new Error(`Nelze aktualizovat bucket: ${error.message}`);
+      }
+    }
+    return;
+  }
 
   const { error } = await supabase.storage.createBucket(PLACE_PHOTOS_BUCKET, {
     public: true,
