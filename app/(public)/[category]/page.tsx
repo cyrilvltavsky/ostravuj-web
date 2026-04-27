@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PlaceCard } from "@/components/place-card";
+import { DistrictFilter } from "@/components/district-filter";
 import {
   getAllCategories,
   getPlacesByCategory,
@@ -78,11 +78,7 @@ export default async function CategoryPage({
               Zatím žádná místa v této kategorii.
             </p>
           ) : (
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {places.map((place) => (
-                <PlaceCard key={place.slug} place={place} />
-              ))}
-            </div>
+            <DistrictFilter places={places} />
           )}
         </div>
       </section>

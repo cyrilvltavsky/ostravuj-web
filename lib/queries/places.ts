@@ -141,6 +141,22 @@ export async function getFeaturedPlaces(): Promise<Place[]> {
   );
 }
 
+/** All featured places — homepage shuffles on the client so order
+ *  changes per visit. No pagination. */
+export async function getAllFeaturedPlaces(): Promise<Place[]> {
+  const rows = await prisma.place.findMany({
+    where: { status: "PUBLISHED", featured: true },
+    include: {
+      category: true,
+      photos: { orderBy: { sortOrder: "asc" }, take: 1 },
+      discountCode: true,
+    },
+  });
+  return rows.map((r) =>
+    toPlaceView(r as unknown as NonNullable<PlaceWithRelations>),
+  );
+}
+
 /**
  * Paginated featured places — used on the homepage.
  * Returns up to `pageSize` items at the given 1-based page index,
