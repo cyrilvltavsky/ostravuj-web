@@ -107,12 +107,16 @@ export async function getPlacePhotos(slug: string): Promise<string[]> {
 export async function getPlacesByCategory(
   categorySlug: CategorySlug,
 ): Promise<Place[]> {
-  // Only match on the primary category — secondary tags in `categorySlugs`
-  // are no longer used for listing.
+  // Match on both the primary category AND the multi-value
+  // categorySlugs array — admin can flag a place under several
+  // top-level categories and it shows up in each listing.
   const rows = await prisma.place.findMany({
     where: {
       status: "PUBLISHED",
-      category: { slug: categorySlug },
+      OR: [
+        { category: { slug: categorySlug } },
+        { categorySlugs: { has: categorySlug } },
+      ],
     },
     include: {
       category: true,
@@ -193,7 +197,10 @@ export async function getFeaturedPlacesPage(
 }
 
 export async function getCategoryCounts(): Promise<Record<string, number>> {
-  // Count places per category by primary categoryId only.
+  // Count places per category by primary categoryId OR membership in
+  // the categorySlugs array — must match getPlacesByCategory's logic
+  // so the badge counts on the homepage equal what the listing page
+  // actually shows.
   const cats = await prisma.category.findMany({
     select: { id: true, slug: true },
   });
@@ -202,7 +209,7 @@ export async function getCategoryCounts(): Promise<Record<string, number>> {
     out[c.slug] = await prisma.place.count({
       where: {
         status: "PUBLISHED",
-        categoryId: c.id,
+        OR: [{ categoryId: c.id }, { categorySlugs: { has: c.slug } }],
       },
     });
   }
@@ -219,7 +226,10 @@ export async function getSubcategoriesInCategory(
   const rows = await prisma.place.findMany({
     where: {
       status: "PUBLISHED",
-      category: { slug: categorySlug },
+      OR: [
+        { category: { slug: categorySlug } },
+        { categorySlugs: { has: categorySlug } },
+      ],
     },
     select: { subcategory: true, subcategories: true },
   });
