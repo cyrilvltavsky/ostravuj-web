@@ -119,18 +119,18 @@ export function RandomPickerProvider({
                 className="object-cover"
               />
             </div>
-            <div className="mt-6 flex gap-2.5">
+            <div className="mt-6 flex flex-col gap-2.5 sm:flex-row">
               <button
                 type="button"
                 onClick={reroll}
-                className="flex flex-1 items-center justify-center gap-2 rounded-[14px] border border-line-hover bg-card px-6 py-3.5 text-[15px] font-semibold text-ink transition hover:-translate-y-0.5 hover:bg-surface"
+                className="flex w-full items-center justify-center gap-2 rounded-[14px] border border-line-hover bg-card px-6 py-3.5 text-[15px] font-semibold text-ink transition hover:-translate-y-0.5 hover:bg-surface sm:flex-1"
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="1"/><circle cx="15" cy="9" r="1"/><circle cx="9" cy="15" r="1"/><circle cx="15" cy="15" r="1"/></svg> Zkusit znovu
               </button>
               <button
                 type="button"
                 onClick={goToPicked}
-                className="flex flex-1 items-center justify-center gap-2 rounded-[14px] bg-gradient-to-r from-peach-strong to-rose-strong px-6 py-3.5 text-[15px] font-semibold text-white transition hover:-translate-y-0.5 hover:shadow-soft-md"
+                className="flex w-full items-center justify-center gap-2 rounded-[14px] bg-gradient-to-r from-peach-strong to-rose-strong px-6 py-3.5 text-[15px] font-semibold text-white transition hover:-translate-y-0.5 hover:shadow-soft-md sm:flex-1"
               >
                 Zobrazit detail →
               </button>
