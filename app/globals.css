@@ -6,7 +6,7 @@
   /* Light theme (default) */
   :root {
     --color-card: 255 255 255;
-    --color-surface: 250 250 250;
+    --color-surface: 247 245 242; /* #f7f5f2 — warm off-white background */
     --color-line: 241 242 244;
     --color-line-hover: 229 231 235;
     --color-ink: 17 24 39;
