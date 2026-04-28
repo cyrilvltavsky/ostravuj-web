@@ -250,7 +250,7 @@ export function SearchProvider({
               {!query.trim() ? (
                 <p className="px-5 py-10 text-center text-sm text-ink-muted">
                   Zadej cokoliv — název podniku, kategorii (gastro, rodina…),
-                  obvod (Poruba, Moravská Ostrava…) nebo třeba „kavárna".
+                  obvod (Poruba, Moravská Ostrava…) nebo třeba „kavárna&rdquo;.
                 </p>
               ) : noResults ? (
                 <p className="px-5 py-10 text-center text-sm text-ink-muted">
