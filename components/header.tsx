@@ -68,7 +68,9 @@ export function Header({ categories }: { categories: CategoryMeta[] }) {
 
         <div className="flex items-center gap-2">
           <RandomButton />
-          <SearchButton variant="iconMobile" />
+          <span className="md:hidden">
+            <SearchButton variant="iconMobile" />
+          </span>
           <ThemeToggle />
           <button
             type="button"

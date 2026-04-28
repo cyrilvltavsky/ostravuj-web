@@ -91,7 +91,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="min-h-screen bg-card font-sans text-ink antialiased">
+      <body className="min-h-screen bg-surface font-sans text-ink antialiased">
         {children}
         <VercelAnalytics />
       </body>
