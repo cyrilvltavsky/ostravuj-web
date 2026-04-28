@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { CategoryMeta } from "@/lib/places";
 import { RandomButton } from "./random-picker";
+import { SearchButton } from "./search";
 import { ThemeToggle } from "./theme-toggle";
 
 export function Header({ categories }: { categories: CategoryMeta[] }) {
@@ -62,6 +63,7 @@ export function Header({ categories }: { categories: CategoryMeta[] }) {
               {cat.title}
             </Link>
           ))}
+          <SearchButton />
         </nav>
 
         <div className="flex items-center gap-2">
@@ -96,6 +98,7 @@ export function Header({ categories }: { categories: CategoryMeta[] }) {
               {cat.title}
             </Link>
           ))}
+          <SearchButton variant="menu" />
         </nav>
       )}
     </header>
