@@ -42,7 +42,11 @@
     text-rendering: optimizeLegibility;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     line-height: 1.6;
+    background-color: #f7f5f2;
     transition: background-color 200ms ease, color 200ms ease;
+  }
+  .dark body {
+    background-color: rgb(var(--color-surface));
   }
 }
 

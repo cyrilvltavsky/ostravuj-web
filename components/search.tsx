@@ -390,7 +390,7 @@ function DistrictChip({ district }: { district: string }) {
 export function SearchButton({
   variant = "icon",
 }: {
-  variant?: "icon" | "menu";
+  variant?: "icon" | "menu" | "iconMobile";
 }) {
   const { open } = useSearch();
 
@@ -399,7 +399,7 @@ export function SearchButton({
       <button
         type="button"
         onClick={open}
-        className="flex items-center gap-3 rounded-xl px-4 py-3.5 text-base font-medium text-ink-muted hover:bg-surface hover:text-gradient"
+        className="flex items-center gap-3 rounded-xl px-4 py-3.5 text-base font-medium text-ink-muted hover:text-gradient"
       >
         <svg
           width="18"
@@ -419,11 +419,39 @@ export function SearchButton({
     );
   }
 
+  // Mobile top-bar variant — same square icon shape as ThemeToggle
+  if (variant === "iconMobile") {
+    return (
+      <button
+        type="button"
+        onClick={open}
+        aria-label="Hledat"
+        title="Hledat"
+        className="flex h-10 w-10 items-center justify-center rounded-card-sm bg-surface text-ink-muted transition hover:text-ink"
+      >
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <circle cx="11" cy="11" r="7" />
+          <path d="m21 21-4.3-4.3" />
+        </svg>
+      </button>
+    );
+  }
+
+  // Desktop nav inline icon — text-only hover
   return (
     <button
       type="button"
       onClick={open}
-      className="flex items-center justify-center rounded-xl p-2.5 text-ink-muted transition-colors hover:bg-surface hover:text-peach-strong"
+      className="flex items-center justify-center rounded-xl p-2.5 text-ink-muted transition-colors hover:text-peach-strong"
       aria-label="Hledat"
       title="Hledat (⌘K)"
     >
