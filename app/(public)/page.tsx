@@ -2,10 +2,12 @@ import Link from "next/link";
 import { AnimateOnScroll } from "@/components/animate-on-scroll";
 import { CategoryCard } from "@/components/category-card";
 import { FeaturedShuffled } from "@/components/featured-shuffled";
+import { HomeSearch } from "@/components/home-search";
 import { BigRandomButton, HeroRandomButton } from "@/components/random-picker";
 import {
   getAllCategories,
   getAllFeaturedPlaces,
+  getAllPlaces,
   getCategoryCounts,
   getSubcategoriesInCategory,
   getTotalPlaceCount,
@@ -15,10 +17,11 @@ import { SUBCATEGORY_LABELS, type SubcategorySlug } from "@/lib/places";
 export const revalidate = 60;
 
 export default async function HomePage() {
-  const [categories, counts, featured, total] = await Promise.all([
+  const [categories, counts, featured, allPlaces, total] = await Promise.all([
     getAllCategories(),
     getCategoryCounts(),
     getAllFeaturedPlaces(),
+    getAllPlaces(),
     getTotalPlaceCount(),
   ]);
   const subsByCategory = await Promise.all(
@@ -57,6 +60,9 @@ export default async function HomePage() {
             Ručně vybrané restaurace, kavárny, hospody, galerie, památky i tipy
             na rande. Jen ta místa, která stojí za to.
           </p>
+          <div className="mb-7">
+            <HomeSearch places={allPlaces} categories={categories} />
+          </div>
           <div className="flex flex-wrap gap-3">
             <HeroRandomButton>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="1"/><circle cx="15" cy="9" r="1"/><circle cx="9" cy="15" r="1"/><circle cx="15" cy="15" r="1"/></svg> Překvap mě
