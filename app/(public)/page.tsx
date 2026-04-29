@@ -2,12 +2,10 @@ import Link from "next/link";
 import { AnimateOnScroll } from "@/components/animate-on-scroll";
 import { CategoryCard } from "@/components/category-card";
 import { FeaturedShuffled } from "@/components/featured-shuffled";
-import { HomeSearch } from "@/components/home-search";
 import { BigRandomButton, HeroRandomButton } from "@/components/random-picker";
 import {
   getAllCategories,
   getAllFeaturedPlaces,
-  getAllPlaces,
   getCategoryCounts,
   getSubcategoriesInCategory,
   getTotalPlaceCount,
@@ -17,11 +15,10 @@ import { SUBCATEGORY_LABELS, type SubcategorySlug } from "@/lib/places";
 export const revalidate = 60;
 
 export default async function HomePage() {
-  const [categories, counts, featured, allPlaces, total] = await Promise.all([
+  const [categories, counts, featured, total] = await Promise.all([
     getAllCategories(),
     getCategoryCounts(),
     getAllFeaturedPlaces(),
-    getAllPlaces(),
     getTotalPlaceCount(),
   ]);
   const subsByCategory = await Promise.all(
@@ -60,9 +57,6 @@ export default async function HomePage() {
             Ručně vybrané restaurace, kavárny, hospody, galerie, památky i tipy
             na rande. Jen ta místa, která stojí za to.
           </p>
-          <div className="mb-7">
-            <HomeSearch places={allPlaces} categories={categories} />
-          </div>
           <div className="flex flex-wrap gap-3">
             <HeroRandomButton>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="1"/><circle cx="15" cy="9" r="1"/><circle cx="9" cy="15" r="1"/><circle cx="15" cy="15" r="1"/></svg> Překvap mě
@@ -71,7 +65,7 @@ export default async function HomePage() {
               href="/doporuc"
               className="inline-flex items-center gap-2.5 rounded-[14px] border border-line-hover bg-card px-6 py-3.5 text-[15px] font-semibold text-ink transition hover:-translate-y-0.5 hover:bg-surface"
             >
-              Doporuč mi místo →
+              Navrhni místo →
             </Link>
           </div>
         </div>
@@ -133,7 +127,7 @@ export default async function HomePage() {
       <AnimateOnScroll>
         <section className="py-20">
           <div className="container-page">
-            <div className="relative overflow-hidden rounded-card-xl bg-gradient-to-br from-[#fff7ed] via-[#fef3f2] to-[#f5f3ff] px-14 py-16 text-center dark:from-[#1f1f23] dark:via-[#27272a] dark:to-[#1a1a1d]">
+            <div className="relative overflow-hidden rounded-card-xl border border-line bg-gradient-to-br from-[#fff7ed] via-[#fef3f2] to-[#f5f3ff] px-14 py-16 text-center dark:from-[#1f1f23] dark:via-[#27272a] dark:to-[#1a1a1d]">
               <span
                 aria-hidden
                 className="absolute left-14 top-10 opacity-60"
