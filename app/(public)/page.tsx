@@ -62,7 +62,7 @@ export default async function HomePage() {
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="1"/><circle cx="15" cy="9" r="1"/><circle cx="9" cy="15" r="1"/><circle cx="15" cy="15" r="1"/></svg> Překvap mě
             </HeroRandomButton>
             <Link
-              href="/doporuc"
+              href="/navrh-misto"
               className="inline-flex items-center gap-2.5 rounded-[14px] border border-line-hover bg-card px-6 py-3.5 text-[15px] font-semibold text-ink transition hover:-translate-y-0.5 hover:bg-surface"
             >
               Navrhni místo →
